@@ -1,0 +1,185 @@
+<html>
+<body>
+
+<div id="header">
+<h2>Chapter 11</h2>
+<h1>WebGL Hands On with ThreeJS: 3D Car</h1>
+</div>
+
+<div id="content">
+
+<h3><a id='cube'>Building A Sky</a></h3>
+
+<p>For our hands on we will create a new scene with a car that can drive around on the ground under a sky.  This is adapted from a series of great blog posts by Jerome, who also created the template builder and tQuery, which is like JQuery for ThreeJS. (<a href='http://learningthreejs.com/blog/2012/05/21/sport-car-in-webgl/'>original series</a>).</p>
+
+
+<p>Start with a new template from the template builder. Now let's add a sky.  The easy way to make a sky is to just put sky pictures on the sides of a big cube. The trick is that we will put the rest of the world <i>inside</i> of the cube. We will start by loading up images into a single cube texture like this:</p>
+
+<pre><code>//add skymap
+//load sky images
+var urls = [
+    "images/sky1.png",
+    "images/sky1.png",
+    "images/sky1.png",
+    "images/sky1.png",
+    "images/sky1.png",
+    "images/sky1.png",
+];
+var textureCube = THREE.ImageUtils.loadTextureCube(urls);
+</code></pre>
+
+<p>The image <code>sky1.png</code> is included in the example code download.</p>
+
+<p>Now we need a cube shader to draw it with standard uniforms (shader inputs). Notice that we've set the <code>tCube</code> texture to be our texture.</p>
+
+<pre><code>
+//setup the cube shader
+var shader = THREE.ShaderUtils.lib["cube"];
+var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
+uniforms['tCube'].texture = textureCube;
+var material = new THREE.ShaderMaterial({
+        fragmentShader : shader.fragmentShader,
+        vertexShader   : shader.vertexShader,
+        uniforms       : uniforms
+});
+</code></pre>
+
+<p>Now we we need a cube geometry. Set the size to 10000. This will be a big cube.  Now we add it to the scene. Notice that you must set <code>flipSided</code> to true. By default a cube has the texture drawn on the outside. Normally this is what you want, but in our case we are on the inside of the cube, so we need to set <code>flipSided</code> to true.</p>
+
+<pre><code>
+//create a skybox
+var size = 10000;
+skyboxMesh = new THREE.Mesh( 
+    new THREE.CubeGeometry(size,size,size),material);
+//IMPORTANT!! draw on the inside instead of outside
+skyboxMesh.flipSided = true; // you must have this or you won't see anything
+scene.add(skyboxMesh);
+</code></pre>
+
+<p>now let's add a light for the sun. without this we might not see anything.</p>
+
+<pre><code>
+//add sunlight
+var light = new THREE.SpotLight();
+light.position.set(0,500,0);
+scene.add(light);
+</code></pre>
+
+<p>here's what we've got so far</p>
+
+<p><img src="images/gl_sky.png"></p>
+
+<h3><a id='ground'>Adding a Ground Plane</a></h3>
+
+<p>Now we want some ground. First you need to load the grass image (<a href='http://www.tutorialsforblender3d.com/Textures/Grass/Grass_1.html'>original source</a>) as a texture (the grass image is included in the example code). Next you must set it to repeat in the x and y directions. The repeat values should be the same as the size of the texture, and usually should be a power of two (ex: 256).</p>
+
+<pre><code>//add ground
+var grassTex = THREE.ImageUtils.loadTexture('images/grass.png');
+grassTex.wrapS = THREE.RepeatWrapping;
+grassTex.wrapT = THREE.RepeatWrapping;
+grassTex.repeat.x = 256;
+grassTex.repeat.y = 256;
+var groundMat = new THREE.MeshBasicMaterial({map:grassTex});</code></pre>
+
+<p>Next is the geometry. This is just a big plane in space. The size of the plane is 400 x 400 which is fairly large compared to the camera but very small relative to the size of the sky, which is set to 10000.</p>
+
+<pre><code>var groundGeo = new THREE.PlaneGeometry(400,400);</code></pre>
+
+<p>Now we can combine them into a mesh. Set the <code>position.y</code> to -1.9 so it will be below the torus. Set the <code>rotation.x</code> to 90 degrees so the ground will be horizontal (the plane is vertical by default).  If you can't see the plane try setting <code>doubleSided</code> to true. Planes only draw on a single side by default.</p>
+
+<pre><code>var ground = new THREE.Mesh(groundGeo,groundMat);
+ground.position.y = -1.9; //lower it
+ground.rotation.x = -Math.PI/2; //-90 degrees around the xaxis
+//IMPORTANT, draw on both sides
+ground.doubleSided = true;
+scene.add(ground);</code></pre>
+
+<p>here's what it should look like now.</p>
+
+<p><img src='images/gl_grass.png'/></p>
+
+<h3><a id='car'>Adding a Car Model</a></h3>
+
+<p>Now we can replace the torus with a car. Again we will load an external model, in this case a very detailed model of a Bugatti Veyron created by <a href='http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129'>Troyano </a>.  I got these from the <a href='https://github.com/mrdoob/three.js/tree/master/examples'>ThreeJS examples repo</a>. You can find them in the example code download. Since this model is in a binary format rather than JSON, we will load it up using the <code>THREE.BinaryLoader</code>.</p>
+
+<pre><code>//load a car			
+//IMPORTANT: be sure to use ./ or it may not load the .bin correctly
+new THREE.BinaryLoader().load('./VeyronNoUv_bin.js', function(geometry) {
+    var orange    = new THREE.MeshLambertMaterial( { color: 0x995500, opacity: 1.0, transparent: false } );
+    var mesh	= new THREE.Mesh( geometry, orange );
+    mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.05;
+    scene.add( mesh );
+    car = mesh;
+});</code></pre>
+
+<p>Notice that the material is a <code>MeshLambertMaterial</code> rather than the <code>MeshNormalMaterial</code> we used before.  This will give the car a nice solid color that is properly shaded based on the light (orange, in this case). This mesh is huge by default compared to the torus, so scale it down to 5%, then add it to the scene.</p>
+
+<p>Here's what it looks like now.</p>
+
+<p><img src='images/gl_car.png'></p>
+
+
+<h3><a id='keyboard'>Keyboard Control</a></h3>
+
+<p>Of course a car just sitting there is no fun. And it's too far away. Let's make it move.  Currently the <code>cameraControl</code> object is moving the camera around. Remove that and create a new <code>KeyboardState</code> object where the <code>cameraControl</code> object was initialized. You will need to import <code>vendor/threex/THREEx.KeyboardState.js</code> at the top of your page.</p>
+
+<pre><code>&lt;script src=&quot;vendor/threex/THREEx.KeyboardState.js&quot;&gt;&lt;/script&gt;</code></pre>
+
+<pre><code>// create a camera contol
+//cameraControls	= new THREEx.DragPanControls(camera)
+keyboard = new THREEx.KeyboardState();</code></pre>
+
+<p>Now, go down to the <code>render()</code> function. The keyboard object will let us query the current state of the keyboard. To move the car around using the keyboard replace <code>cameraControls.update()</code> with this code:</p>
+
+<pre><code>// update camera controls
+//cameraControls.update();
+if(keyboard.pressed("left")) {
+    car.rotation.y += 0.1;
+}
+if(keyboard.pressed("right")) {
+    car.rotation.y -= 0.1;
+}
+if(keyboard.pressed("up")) {
+    car.position.z -= 1.0;
+}
+if(keyboard.pressed("down")) {
+    car.position.z += 1.0;
+}</code></pre>
+
+<p>Now the car will move around and rotate with the keyboard. Of course it doesn't look very realistic. The car can slide sideways. Instead we need a vector to represent the current direction of the car and adjust that vector.  add an angle variable and change the code to look like this:</p>
+
+<pre><code>if(keyboard.pressed("left")) {
+    car.rotation.y += 0.1;
+    angle += 0.1;
+}
+if(keyboard.pressed("right")) {
+    car.rotation.y -= 0.1;
+    angle -= 0.1;
+}
+if(keyboard.pressed("up")) {
+    car.position.z -= Math.sin(-angle);
+    car.position.x -= Math.cos(-angle);
+}
+if(keyboard.pressed("down")) {
+    car.position.z += Math.sin(-angle);
+    car.position.x += Math.cos(-angle);
+}</code></pre>
+
+
+<h3><a id='next'>Next Steps</a></h3>
+
+<p>That's it for this hands on.  if you wish to continue working with this example here are a few things you might want to add.</p>
+
+<ul>
+<li>make the camera follow the car</li>
+<li>make the car shiny. look at the source to the original example that this was based on. [link]</li>
+<li>make the car stop when you reach the edge of the world</li>
+<li>Add the dot screen effect from the previous chapter to this scene.</li>
+</ul>
+
+
+<p><a href='http://mrdoob.github.com/three.js/docs/49/'>ThreeJS documentation</a></p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<html>
+<body>
+
+<div id="header">
+<h2>Chapter 10</h2>
+<h1>3D Graphics with WebGL and ThreeJS</h1>
+</div>
+
+
+<div id="content">
+
+<h3><a id='overview'>Overview</a></h3>
+
+<p>WebGL is 3D for the web. And as the name implies, it is related to OpenGL,
+the industry standard API for hardware accelerated 3D graphics. 3D is a lot more
+complicated than 2D. Not only do we have to deal with a full three dimensional
+coordinate system and all of the math that goes with it, but we have to worry a
+lot more about the state of the graphics context. Far, far more than the basic
+colors and transforms of the 2D context.</p>
+
+<p>In 2D we draw shapes with paths then fill them with fill styles. It's very
+simple. 3D on the other hand, involves a very complex multi-stage process: </p>
+
+<p>First, we have shapes in the form of geometry, lists of points in 3D space
+called "vectors". Next, we may have additional information for the shapes.
+Surface normals, for example, describe the direction that light bounces off of
+the shape. Then, we must set up lights and a camera. The camera defines point of
+view. The lights are just what they sound like, points in space that specify
+where the light is coming from. With all of this set up, we apply shaders.</p>
+
+<p>Shaders take the camera, light, normals, and geometry as inputs to draw the actual pixels.  (I realize this is a very simplified explanation of OpenGL, but please bear with me.)  There are two kinds of shaders, one used to modify the vectors to create final light reflections and another that draws the actual pixels. This latter shader is known as a pixel shader, for obvious reasons.</p>
+
+<p>Shaders are essentially tiny programs written in a special OpenGL language
+that looks like a form of C. This code is not very easy to write because it must
+be massively parallel. A modern graphics processor is essentially a special
+super parallel multi-core chip that does one thing very efficiently: render lots
+of pixels very fast.</p>
+
+<p>Shaders are the power behind modern graphics but they are not easy to work
+with. On the plus side your app can install its own shaders to do lots of
+amazing things, but the minus side is your app <i>has</i> to install its own
+shaders. There are no shaders pre-built into the WebGL standard. You must bring
+your own.</p>
+
+<p>The above is a simplified version how OpenGL ES 2.0 and OpenGL 3 work (older
+versions of OpenGL did not have shaders.) It is a complex but flexible system.
+WebGL is essentially the same, just with a JavaScript API instead of C.</p>
+
+<p>We simply don't have time for me to teach you OpenGL. We could easily fill up
+an entire week-long conference learning OpenGL. Even if we did have the time,
+you probably wouldn't write code this way. It would take you thousands of lines
+of to make a fairly simple game. Instead, you would use a library or graphics
+engine to do the low-level stuff for you, letting you concentrate on what
+your app actually does. In the WebGL world, the most popular such library is an
+open source project called <a
+href="http://mrdoob.github.com/three.js/">ThreeJS</a>. It greatly simplifies
+building interactive 3D apps and comes with its own set of reusable shaders. That is what I'm going to teach you today: ThreeJS.</p>
+
+<h3><a id="examples">Examples</a></h3>
+
+<p>First a few examples.</p>
+
+<p><a href="http://yagiz.me/zombiesvscow/
+"><img src="images/cowvszombie.png"/></a></p>
+
+<p>This is a simple game called Zombies vs Cow where you use the arrow keys to
+make the cow avoid getting eaten by the zombies. It is completely 3D and
+hardware accelerated. It looks much like a professional game that you might see
+on the Wii, but it is done entirely in a web browser.</p>
+
+<p>Here is another example that gives you a Google Earth like experience without
+installing a separate app.</p>
+
+<p><a href='http://www.webglearth.com/'><img src='images/webgl_earth.png'/></a></p>
+
+<p>Here is another example that does interesting
+visualizations of audio with 3D.</p>
+
+<p><a href='http://jeromeetienne.github.com/webaudio.js/examples/histotquery.html'>
+<img src='images/sound_vis_gl.png'/></a></p>
+
+
+<p>All of these were created with Three.JS and WebGL</p>
+
+<h3><a id='browsersupport'>Browser Support</a></h3>
+
+<p>Before we dive in, a word on browser support. Opera, FireFox and all of the
+desktop WebKit based browsers support WebGL. Typically they map down to the native
+OpenGL stack. The big hole here is Internet Explorer. While IE 10 has excellent
+support for 2D canvas, it does not support WebGL. Furthermore, Microsoft has not
+announced any plans to support it in the future. It's unclear what effect this will have in the Windows 8 world where 3rd party browsers and plugins are disallowed.</p>
+
+<p>On the mobile side there is virtually, no support for WebGL. iOS supports it
+but only as part of iAd, not in the regular browser. This suggests that Apple
+may add it in the future, however. Some Android phones support WebGL, but
+usually only if an alternate browser like FireFox or Opera is installed. Since
+desktop Chrome supports WebGL, and Google is making Chrome the Android
+default, hopefully we will get WebGL as standard on Android as well. The only
+mobile device that ships with good WebGL support out of the box is actually the
+BlackBerry Playbook. So while support isn't great on mobile it will probably get
+better over the next year or so. WebGL will be a part of the future web
+standards and has some big names behind it, so now is a good time to get
+started.</p>
+
+<h3><a id='template'>A ThreeJS Template</a></h3>
+
+<p>ThreeJS is an open source library created by creative coder extraordinaire, <a href="http://mrdoob.com/">Mr. Doob</a>. His real name is Ricardo Cabello, but if you search for Mr. Doob you will find his cool graphics hacks going back at least a decade.  ThreeJS is a library that sits on top of WebGL. It automates the annoying things so you can focus on your app.  To make it even easier to work with Jerome Etienne, has created a <a href="http://jeromeetienne.github.com/threejsboilerplatebuilder/">boiler plate builder</a> that will give you a headstart. It fills in all of the common things like the camera, mouse input, and rendering, so that you can start with a working ThreeJS application.</p>
+
+<p>Let's see how easy it can be. Go to the <a href="http://jeromeetienne.github.com/threejsboilerplatebuilder/">ThreeJS Boiler Plate Builder</a> and download a new template. Unzip it and open the index.html page in your browser to ensure it works. You should see something like this:</p> 
+
+<p><img src='images/webgl_boilerplate.png'/></p>
+
+<p>Now open up the <code>index.html</code> file in your text editor. Notice that the template is pretty well documented. Let's start with the <code>init</code> function.</p>
+
+
+<pre><code>// init the scene
+function init(){
+
+if( Detector.webgl ){
+    renderer = new THREE.WebGLRenderer({
+        antialias : true,	// to get smoother output
+        preserveDrawingBuffer : true	// to allow screenshot
+    });
+    renderer.setClearColorHex( 0xBBBBBB, 1 );
+// uncomment if webgl is required
+//}else{
+//	Detector.addGetWebGLMessage();
+//	return true;
+}else{
+    renderer	= new THREE.CanvasRenderer();
+}
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.getElementById('container').appendChild(renderer.domElement);
+</code></pre>
+
+<p>First, the template initializes the system. It tries to create a WebGL renderer because ThreeJS actually supports some other backends like 2D canvas. For this we only want WebGL. If it can't create a <code>WebGLRenderer</code> it will fall back to 2D canvas. Though canvas will be much slower it might be better than showing nothing. It's up to you.</p>
+
+<p>Then, it sets the size of the canvas and adds it to the page as a child of <code>container</code> (a DIV declared in the document.)
+</p>
+
+<pre><code>// add Stats.js - https://github.com/mrdoob/stats.js
+stats = new Stats();
+stats.domElement.style.position	= 'absolute';
+stats.domElement.style.bottom	= '0px';
+document.body.appendChild( stats.domElement );
+</code></pre>
+
+<p>Next, it creates a <code>Stats</code> object and adds it to the scene. This will show us how fast our code is running.</p>
+
+<pre><code>// create a scene
+scene = new THREE.Scene();</code></pre>
+
+
+<p>Finally, it creates a <code>Scene</code>.  ThreeJS uses a tree structure called a scene graph. The <code>scene</code> is the root of this tree. Everything we create within the scene will be a child node in the scene tree.</p>
+
+
+<pre><code>// put a camera in the scene
+camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 10000 );
+camera.position.set(0, 0, 5);
+scene.add(camera);</code></pre>
+
+<p>Next comes the camera. This is a perspective camera. Generally you can leave these values alone, but it is possible to change the position of the camera if you wish.</p>
+      
+<pre><code>// create a camera contol
+cameraControls	= new THREEx.DragPanControls(camera)</code></pre>
+
+<p><code>DragPanControls</code> is a utility object which will move the camera around as you drag the mouse. You can remove it if you want some other kind of control.</p>
+      
+<pre><code>// transparently support window resize
+THREEx.WindowResize.bind(renderer, camera);
+// allow 'p' to make screenshot
+THREEx.Screenshot.bindKey(renderer);
+// allow 'f' to go fullscreen where this feature is supported
+if( THREEx.FullScreen.available() ){
+    THREEx.FullScreen.bindKey();		
+    document.getElementById('inlineDoc').innerHTML	+= "- <i>f</i> for fullscreen";
+}</code></pre>
+
+
+<p>Normally we have to handle window resizing manually, but the <code>Threex.WindowResize</code> object (provided by the template, not ThreeJS) will handle it for us. It will resize the scene to fit the window.
+The next lines add a fullscreen mode using the 'f' key and a screenshot using the 'p' key.</p>
+      
+<p>Okay, now that we are past the boiler plate, we can add a shape to the scene. We will start with a <a href='http://en.wikipedia.org/wiki/Torus'>torus</a>, which is a donut shape. ThreeJS has support for several standard shapes including the torus.  
+</p>
+
+
+<pre><code>// here you add your objects
+// - you will most likely replace this part by your own
+var geometry	= new THREE.TorusGeometry( 1, 0.42 );
+var material	= new THREE.MeshNormalMaterial();
+var mesh	= new THREE.Mesh( geometry, material );
+scene.add( mesh );</code></pre>
+
+<p>An object in the scene is called a <i>mesh</i>. A mesh is composed of two parts: the geometry and the material. The template uses torus geometry and standard normal material, which always reflects light perpedicularly to the surface of the geometry.  It reflects light but doesn't have a set color.  This is how the template creates the mesh and adds it to the scene.</p>
+
+<pre><code>// animation loop
+function animate() {
+
+    // loop on request animation loop
+    // - it has to be at the begining of the function
+    // - see details at http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+    requestAnimationFrame( animate );
+
+    // do the render
+    render();
+
+    // update stats
+    stats.update();
+}
+</code></pre>
+
+<p>Now let's move down to the <code>animate</code> function. <code>animate</code> calls itself with <code>requestAnimationFrame</code> (which we learned about in the animation chapter,) invokes <code>render()</code> and updates the stats.</p>
+
+
+
+<pre><code>// render the scene
+function render() {
+
+    // update camera controls
+    cameraControls.update();
+
+    // actually render the scene
+    renderer.render( scene, camera );
+}</code></pre>
+
+<p>The <code>render</code> function is called for every frame of animation. First, it calls update on the camera controls to enable camera movement in response to mouse and keyboard input. Then, it calls <code>renderer.render</code> to actually draw the scene on the screen.</p>
+
+<p>That's it. Here's what it looks like:</p>
+
+<p><img src='images/webgl_boilerplate.png'/></p>
+
+
+<h3><a id='customizing'>Customizing the Template</a></h3>
+
+<p>Now let's customize it a bit. Every object in the scene is capable of basic scale, rotate, and position transformations. Let's rotate the torus with <code>mesh.rotation.y = Math.PI/2</code>.  Note that rotations are in radians, not degrees.  Math.PI/2 is 90 degrees.  </p>
+
+<pre><code>
+var geometry	= new THREE.TorusGeometry( 1, 0.42 );
+var material	= new THREE.MeshNormalMaterial();
+var mesh	= new THREE.Mesh( geometry, material );
+<b>mesh.rotation.y = Math.PI/2; //90 degrees</b>
+</code></pre>
+
+<p>Now let's comment out the torus and replace it with something more complex.
+ThreeJS can use pre-fab models as well as generated ones like the torus. The <a
+href="http://en.wikipedia.org/wiki/Utah_teapot">Utah Teapot</a> is the "Hello
+World" of the graphics world, so let's start with that. The teapot geometry is
+encoded as a JSON file. We download <code>teapot.js</code> from the <a
+href='http://joshondesign.com/p/books/canvasdeepdive-examples/WebGL/'>examples
+repo</a> and place it in the same directory as <code>index.html</code>. Next, we
+load it with <code>THREE.JSONLoader().load()</code>. When it finishes loading, we
+add it to the scene as a new mesh model, again employing a standard normal material.
+(<code>teapot.js</code> originally came from <a
+href="https://github.com/jeromeetienne/threex/tree/master/examples/threex.domevent/models
+">Jerome's repo</a>.)</p>
+
+<pre><code>//scene.add( mesh );
+
+new THREE.JSONLoader().load('teapot.js', function(geometry) {
+    var material	= new THREE.MeshNormalMaterial();
+    var mesh	= new THREE.Mesh( geometry, material );
+    scene.add( mesh );
+    teapot = mesh;
+});</code></pre>
+
+<p>Now let's add some animation and make the teapot rotate on each frame. We simply set a teapot variable and adjust its rotation by 0.01 on each frame.</p>
+
+<pre><code>// update camera controls
+cameraControls.update();
+teapot.rotation.y += 0.01;</code></pre>
+
+<h3><a id='shadereffects'>Shader Effects</a></h3>
+
+<p>Finally, we will add some post-processing effects. They are called <i>post-processing</i> because they happen after the main rendering phase. These parts of the ThreeJS API are somewhat experimental and not documented well, but I'm going to show them to you anyway because they are very powerful. Post-processing requires adding more scripts to our page. We'll need <code>ShaderExtras.js</code>, <code>RenderPass.js</code>, <code>BloomPass.js</code>, <code>ShaderPass.js</code>, <code>EffectComposer.js</code>, <code>DotScreenPass.js</code>, and <code>MaskPass.js</code>.</p>
+
+<pre><code>&lt;script src=&quot;vendor/three.js/ShaderExtras.js&quot;&gt;&lt;/script&gt;
+
+&lt;script src=&quot;vendor/three.js/postprocessing/RenderPass.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;vendor/three.js/postprocessing/BloomPass.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;vendor/three.js/postprocessing/ShaderPass.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;vendor/three.js/postprocessing/EffectComposer.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;vendor/three.js/postprocessing/DotScreenPass.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;vendor/three.js/postprocessing/MaskPass.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+
+
+<p>We begin by creating a new function called <code>initPostProcessing()</code>. Inside it we will create an effect composer.</p>
+
+<pre><code>function initPostProcessing() {
+
+    composer = new THREE.EffectComposer(renderer);</code></pre>
+
+<p>Next, we will add a render pass which will render the entire scene into a texture image. We have to tell it that it won't be rendering to the screen, then add it to the composer.</p>
+
+<pre><code>renderModel = new THREE.RenderPass(scene,camera);		    
+renderModel.renderToScreen = false;
+composer.addPass(renderModel);</code></pre>
+
+<p>Next, we will create a dot screen pass.  These are some good default values but you can adjust them to get different effects.  This pass <i>will</i> go to the screen so we will set <code>renderToScreen</code> to true and add it to the composer.</p>
+
+<pre><code>var effectDotScreen = new THREE.DotScreenPass(
+    new THREE.Vector2(0,0), 0.5, 0.8);
+effectDotScreen.renderToScreen = true;
+composer.addPass(effectDotScreen);</code></pre>
+
+
+<p>Now, we need to update the <code>render</code> function. Instead of calling <code>renderer.render()</code> we will call <code>renderer.clear()</code> and <code>composer.render()</code>;  </p>
+
+
+<pre><code>// actually render the scene
+//renderer.render( scene, camera );
+
+//alt form
+renderer.clear();
+composer.render();</code></pre>
+
+<p>We also have to call <code>initPostProcessing</code> as the last line of the init function.</p>
+
+<pre><code>initPostProcessing();</code></pre>
+
+<p>Here's what it looks like. Crazy huh!</p>
+
+<p><img src="images/dot_screen_teapot.png"/></p>
+
+
+<p>Just for curiosity, if we open up <code>ShaderExtras.js</code> we can see the actual shader math, which creates the dot pattern and generates the final color for each pixel.</p>
+
+<pre><code>fragmentShader: [
+
+    "uniform vec2 center;",
+    "uniform float angle;",
+    "uniform float scale;",
+    "uniform vec2 tSize;",
+
+    "uniform sampler2D tDiffuse;",
+
+    "varying vec2 vUv;",
+
+    "float pattern() {",
+
+        "float s = sin( angle ), c = cos( angle );",
+
+        "vec2 tex = vUv * tSize - center;",
+        "vec2 point = vec2( c * tex.x - s * tex.y, s * tex.x + c * tex.y ) * scale;",
+
+        "return ( sin( point.x ) * sin( point.y ) ) * 4.0;",
+
+    "}",
+
+    "void main() {",
+
+        "vec4 color = texture2D( tDiffuse, vUv );",
+
+        "float average = ( color.r + color.g + color.b ) / 3.0;",
+
+        "gl_FragColor = vec4( vec3( average * 10.0 - 5.0 + pattern() ), color.a );",
+
+    "}"
+
+].join("\n")</code></pre>
+
+<h3><a id='moredetails'>A Few More Details</a></h3>
+
+<p>Much like OpenGL, WebGL doesn't support text directly. Instead, you must draw text using a 2D canvas, then add it as a texture onto a plane. (see <a href='http://webglfactory.blogspot.com/2011/06/render-text-with-canvas-2d.html'>WebGL Factor's explanation</a>.)</p>
+
+<p>There is a library for building quick GUIs called <b>dat-gui</b>. The project page <a href="http://code.google.com/p/dat-gui/">is here</a>.</p>
+
+
+<p>There are model loaders for a lot of formats. You will probably use the Collada or JSON loaders. (DAE files are for <a href="http://en.wikipedia.org/wiki/COLLADA">Collada</a>). Some are just geometry, some include textures and animation, like the monster loader.  Loaders are important because most complex geometry won't be created in code, instead you would use geometry created by someone else, probably using a 3D modeler tool like Blender or Maya.</p>
+
+<p>For the most part, any general performance tips for OpenGL apply to WebGL. For example, you should always cache geometry and materials on the GPU.</p>
+
+<p><a href='http://creativejs.com/'>CreativeJS</a> has lots of good examples of 2D Canvas and WebGL.</p>
+
+<p>In the next chapter, you will do a hands on lab in which you will create a new app with a car that drives around on a large grassy plain under a starry sky.</p>
+
+
+</div>
+
+</body>
+</html>

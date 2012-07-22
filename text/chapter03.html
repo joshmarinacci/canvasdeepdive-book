@@ -1,0 +1,332 @@
+<html>
+<body>
+
+<div id="header">
+<h2>Chapter 3</h2>
+<h1>Advanced Drawing and Events</h1>
+</div>
+
+<div id="content">
+
+<h3><a id="image_fills">Image Fills</a></h3>
+
+<p>In <a href="chapter1.html">Chapter 1</a> we learned that Canvas can fill shapes with colors and gradients.  You can also fill shapes with images by defining a pattern. You can control how the pattern is repeated the same as you would with background images in CSS.</p>
+
+<!--
+
+<pre><code>var img = new Image();
+img.onload = function() {
+    
+    var canvas = document.getElementById('can');
+    var c = canvas.getContext('2d');
+    var pat = c.createPattern(img,'repeat');    
+    c.fillStyle = pat;
+    c.fillRect(10,10,80,80);    
+    
+    var canvas2 = document.getElementById('can2');
+    var c2 = canvas2.getContext('2d');
+    var pat2 = c2.createPattern(img,'repeat-y');    
+    c2.fillStyle = pat2;
+    c2.fillRect(10,10,80,80);    
+    
+}
+img.src = 'smile.png';</code></pre>
+
+<div class='photo'><img src="images/image_fill.png"/></div>
+-->
+<p>As with gradients, the pattern is drawn relative to the current coordinate system. That's why I had to translate by 200 pixels to the right before drawing the second rectangle. Since it doesn't repeat in the X direction, only y, making the filled area bigger won't actually draw more of the pattern. <b>Try dragging the values around to see how it works.</b></p>
+
+<div id="imagefill" class='jangle'>
+    <canvas width="400" height="100"></canvas>
+    <pre></pre>
+    <div class='popup shadow'>000</div>
+</div>
+<script type="text/javascript" class='bookscript'>
+$(document).ready(function() {
+    var img = new Image();
+
+    function drawit(ctx, var1, var2, var3, var4) {
+var pat1 = ctx.createPattern(img,'repeat');    
+ctx.fillStyle = pat1;
+ctx.fillRect(var1,0,var2,100);    
+
+var pat2 = ctx.createPattern(img,'repeat-y');    
+ctx.fillStyle = pat2;
+ctx.translate(200,0);
+ctx.fillRect(var3,0,var4,100);    
+    }
+    
+img.onload = function() {
+    console.log('image was loaded');
+    var tangle = new Jangle();
+    tangle.drawfun = drawit;
+    tangle.vars = { var1:0, var2:100, var3:0, var4:100 };
+    tangle.setup("imagefill");
+};
+
+console.log('setting up the smile stuff ' + img);
+img.src = './images/tile.png';
+});
+</script>
+
+
+<p>Note that filling with an image texture only works if the image has already been loaded, so be sure to do the drawing from the image's <code>onload</code> callback.</p>
+
+
+<h3><a id="opacity">Opacity</a></h3>
+
+<p>The Canvas API lets you control the opacity of any drawing function with the <code>globalAlpha</code> property. This next demo draws two red squares overlapping with the background showing through by changing the globalAlpha 
+before each drawing operation.</p>
+
+
+<div id="opacitydemo" class='jangle'>
+    <canvas width="400" height="100"></canvas>
+    <pre></pre>
+    <div class='popup shadow'>000</div>
+</div>
+<script type="text/javascript" class='bookscript'>
+$(document).ready(function() {
+
+    function drawit(ctx, var1, var2, var3, var4) {
+ctx.fillStyle = 'red';
+//divide by 100 to get a fraction between 0 and 1
+ctx.globalAlpha = var1/100; 
+ctx.fillRect(0,0,50,50);
+ctx.globalAlpha = var2/100;
+ctx.fillRect(25,25,50,50);
+ctx.globalAlpha = 1.0;
+    }
+    
+var tangle = new Jangle();
+tangle.drawfun = drawit;
+tangle.vars = {var1:50, var2: 30};
+tangle.setup("opacitydemo");
+
+});
+</script>
+
+
+<p>This opacity setting works with all drawing operations. <b>Try changing the opacity values above to see the effect.</b> Be sure to set it back to 1.0 when you are done so that it won't affect later drawing.  The <code>globalAlpha</code> property must be a value between 0 and 1 or else it will be ignored (or may unexpected behavior on some platforms).</p>
+
+
+<h3><a id="transforms">Transforms</a></h3>
+
+<p>In the bar chart chapter we drew the same rectangle over and over again just with different x and y coordinates. Rather than modifying those coordinates we could have used a translate function. Each time through the loop we can translate by an additional 100 pixels to move the next bar over to the right.
+</p>
+
+<div id="translatedemo" class='jangle'>
+    <canvas width="500" height="100"></canvas>
+    <pre></pre>
+    <div class='popup shadow'>000</div>
+</div>
+<script type="text/javascript" class='bookscript'>
+$(document).ready(function() {
+
+var data = [10,20,60,5];
+function drawit(ctx, var1, var2, var3, var4) {
+ctx.fillStyle = "red";
+for(var i=0; i<data.length; i++) {
+    var dp = data[i];
+    ctx.translate(var1, 0);
+    ctx.fillRect(0,0,50,dp);
+}
+}
+
+var tangle = new Jangle();
+tangle.drawfun = drawit;
+tangle.vars = {var1:100};
+tangle.setup("translatedemo");
+
+});
+</script>
+
+<p><b>Try dragging the x translate variable</b> to see how the effect combines across the chart.</p>
+
+
+<p>Like many 2D APIs, Canvas has support for the standard translate, rotate, and
+scale transforms. This lets you draw shapes transformed around on the screen
+without having to calculate new points by hand. Canvas does the math for you.
+You can also combine transforms by calling them in order. For example, to draw a
+rectangle translated to the center and then rotated by 30 degrees you would do
+this: </p>
+
+
+<div id="rotatedemo" class='jangle'>
+    <canvas width="200" height="200"></canvas>
+    <pre></pre>
+    <div class='popup shadow'>000</div>
+</div>
+<script type="text/javascript" class='bookscript'>
+$(document).ready(function() {
+
+function drawit(ctx, x1, y1, rot1) {
+ctx.fillStyle = "red";
+ctx.translate(x1,y1);
+//convert degrees to radians
+var rads = rot1 * Math.PI*2.0/360.0;
+ctx.rotate(rads)
+ctx.fillRect(0,0,100,100);
+}
+
+var tangle = new Jangle();
+tangle.drawfun = drawit;
+tangle.vars = {x1:50,y1:50,rot1:30};
+tangle.setup("rotatedemo");
+
+});
+</script>
+
+
+<p>Each time you call translate, rotate, or scale it adds on to the previous transformation. Over time this could get confusing, of course. You could undo the transforms like this:
+</p>
+
+<pre><code>for(var i=0; i&lt;data.length; i++) {
+    <b>c.translate(40+i*100, 460-dp*4);</b>
+    var dp = data[i];
+    c.fillRect(0,0,50,dp*4);
+    <b>c.translate(-40-i*100, -450+dp*4);</b>
+}</code></pre>
+
+
+<p>but that's a lot of annoying code to write. If you forget to undo it just once then you could be screwed and spend hours looking through your code for that one bug. (not that <i>I've</i> ever done that, of course!)  Instead Canvas provides a state saving API.</p>
+
+<h3><a id="statesaving">State Saving</a></h3>
+
+<p>The context2D object represents the current drawing state. In this book I
+always use the <code>ctx</code> variable to hold this context. The state
+includes the current transform, the fill and stroke colors, the current font,
+and a few other variables. You can save this state by pushing it onto a stack
+using the <code>save()</code> function. After you save the state you can make
+modifications, then restore to the previous state with the
+<code>restore()</code> function. Canvas takes care of the book-keeping for you.
+Here is the previous example written with state saving instead. Notice that we
+don't have to do the un-translation step.</p>
+
+<pre><code>for(var i=0; i&lt;data.length; i++) {
+    c.save();
+    <b>c.translate(40+i*100, 460-dp*4);</b>
+    var dp = data[i];
+    c.fillRect(0,0,50,dp*4);
+    c.restore();
+}</code></pre>
+
+
+
+<h3><a id="clipping">Clipping</a></h3>
+
+<p>Sometimes you may want to draw just part of a shape. You can do this with the clip function. It takes the current shape and uses it as a mask for further drawing. This means that any drawing will only happen <i>inside</i> of the clip. Anything you draw <i>outside</i> of the clip will not be shown on screen. This can be useful for when you want to create a complex graphic by combining shapes, or when you want to update just a part of the screen for performance reasons.  Here's an example where we draw a bunch of squares clipped by a circle:
+</p>
+
+<!--
+<pre><code>c.strokeStyle = &quot;black&quot;;
+c.lineWidth = 10;
+c.fillStyle = &quot;red&quot;;
+
+<i>// draw rect the first time</i>
+c.fillRect(0,0,600,200);
+
+c.save();
+
+<i>// create triangle path</i>
+c.beginPath();
+c.moveTo(200,100);
+c.lineTo(300,300);
+c.lineTo(100,300);
+c.closePath();
+
+<i>// stroke the triangle so we can see it</i>
+c.stroke();
+
+<i>// use triangle as clip, then fill rect in again with yellow</i>
+c.clip();
+c.fillStyle = &quot;yellow&quot;;
+c.fillRect(0,0,600,200);
+c.restore();</code></pre>
+
+<p class='photo'><img src="images/clipping.png"/></p>
+-->
+     
+<div id="clippingdemo" class='jangle'>
+    <canvas width="400" height="200"></canvas>
+    <pre></pre>
+    <div class='popup shadow'>000</div>
+</div>
+<script type="text/javascript" class='bookscript'>
+$(document).ready(function() {
+
+function drawit(ctx, var1, var2, var3) {
+// draw rect the first time
+ctx.fillStyle = 'red';
+ctx.fillRect(0,0,400,100);
+
+// create triangle path
+ctx.beginPath();
+ctx.moveTo(200,var1);
+ctx.lineTo(250,150);
+ctx.lineTo(150,150);
+ctx.closePath();
+
+// stroke the triangle so we can see it
+ctx.lineWidth = 10;
+ctx.stroke();
+
+// use triangle as clip, 
+ctx.clip();
+//fill rect in again with yellow
+ctx.fillStyle = 'yellow';
+ctx.fillRect(0,0,400,100);
+}
+
+var tangle = new Jangle();
+tangle.drawfun = drawit;
+tangle.vars = {var1:50};
+tangle.setup("clippingdemo");
+
+});
+</script>
+
+<p>Notice how the yellow rectangle fills the intersection of the red 
+rectangle and the triangle. Also notice that the lower part of the
+triangle has a thick border, but the upper part has a thinner border. This is
+because the border is centered on the actual geometric edges of the triangle shape. The yellow covers up the inside border when it is clipped by the geometric triangle, but the outside border remains uncovered. </p>
+
+
+<h3><a id="events">Events</a></h3>
+
+<p>Canvas doesn't define any new events. You can listen to the same mouse and
+touch events that you'd work with anywhere else. This is both good and bad.</p>
+
+<p>The Canvas just looks like a rectangular area of pixels to the
+rest of the browser. The browser doesn't know about any shapes you've drawn. If
+you drag your mouse cursor over the canvas then the browser will send you
+standard drag events to the canvas as a whole, not to anything <i>within</i> the
+canvas. This means that if you want to do special things like making buttons or
+a drawing tool you will have to do the event processing yourself by converting
+the raw mouse events that the browser gives you to your own data model. </p>
+
+<p>Calculating which shape is under the mouse cursor could be very difficult.
+Fortunately Canvas has an API to help: <code>isPointInPath</code>. This function
+will tell you if a given coordinate is inside of the current path. Here's a
+quick example: </p>
+
+<pre><code>c.beginPath();
+c.arc(
+    100,100, 40,  //40 pix radius circle at 100,100
+    0,Math.PI*2,  //0 to 360 degrees for a full circle
+);
+c.closePath();
+var a = c.isPointInPath(80,0);     // returns true
+var b = c.isPointInPath(200,100);  // returns false</code></pre>
+
+
+<p>Another option is to use a scenegraph library such as <a
+href="http://goamino.org/" target="_blank">Amino</a> which lets you work in terms of shapes
+instead of pixels. It will handle event processing and repaints for you.
+</p>
+
+</div>
+
+
+</body>
+</html>
+
