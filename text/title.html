@@ -1,0 +1,189 @@
+<html>
+<head>
+<meta name="viewport" content = "width = device-width; initial-scale=1; maximum-scale=1; user-scalable=no;" />
+<title>HTML Canvas Deep Dive</title>
+
+<style type="text/css">
+
+h1 {
+/*	text-shadow: 2px -2px 0px black;*/
+	color: white;
+	font-size: 500%;
+	margin-bottom: 0; 
+	text-shadow: 3px -3px 0px black;
+}
+
+.subtitle {
+	color: black;
+/*	text-shadow: 0px 1px 0px;*/
+	font-size: 200%;
+	margin-top: 0;
+/*	text-shadow: 0px 1px 0px rgba(0,0,0,0.5);*/
+	font-style: italic;
+}
+
+#header {
+	padding-bottom: 1em;
+	padding-top: 3em;
+}
+
+/*
+body {
+    width:300px !important;
+    border: 1px solid red;
+    padding: 0px;
+}
+*/
+
+canvas { 
+	border: 0px solid black;
+	position: absolute; 
+	right: 0; 
+	top: 0;
+	background-color: transparent;
+	margin: 0;
+	padding: 0;
+}
+
+</style>
+
+</head>
+<body>
+
+<div id="header">
+	<h1>HTML Canvas Deep Dive</h1>
+	<p class="subtitle">A Travelogue</p>
+	<p>Josh Marinacci<br/>@joshmarinacci<br/>Josh On Design.com</p>
+</div>
+
+
+<div id="content">
+
+<p>What you are reading is an ebook experiment. It is built to showcase the
+power of modern web standards with interactive electronic texts. Everything you
+see is done with HTML, CSS and Javascript; bundled into book form with open
+source tools. Read by scrolling down through each chapter or using the
+navigation footer at the bottom of the screen.</p>
+
+<p>This book is an <b>EverBook</b>, my term for a book which is complete but
+will continue to be updated. Since it is sold as an app you will receive free
+updates forever. Just check in your device's app store / catalog. If you find a
+bug or want me to cover a new feature, please let me know on my blog or
+Twitter.</p>
+
+<p> HTML Canvas is an amazing drawing technology built into all modern web
+browsers. With Canvas you can draw shapes, manipulate photos, build games, and
+animate virtually anything; all with proper web standards. You can even create
+mobile apps with it.</p>
+
+<p><i>HTML Canvas Deep Dive</i> is a hands on introduction to Canvas. Code along
+with the book and play with interactive examples. When you finish reading this
+short tome you will have the skills to make charts, effects, diagrams, and games
+that integrate into your existing web content. </p>
+
+
+<p>This book is organized into two kinds of sections. There are reading portions
+where I describe how an API works and give you interactive examples. Then there
+are hands on lessons for you to walk through and build your own canvas apps. The
+code to these sections is available for you to download and walk through on your
+own computer. In terms of skill you only need to know some basic javascript and
+HTML. All you need on your computer is a copy of Chrome or Safari and your
+favorite text editor. Canvas is very easy to work with: no IDEs required.</p>
+
+</div>
+
+<canvas id="sim" width="250" height="500"></canvas>
+
+
+<script type="text/javascript" class='bookscript'>
+console.log("inside the title code init");
+console.log("unloaders = " + window.ebook.unloaders);
+
+function ParticleSimulator() {
+	AminoNode.call(this);
+	this.parts = [];
+	this.max = 50;
+	this.tick = 0;
+	this.paint = function(ctx) {
+		//create
+		if(this.parts.length < this.max) {
+			var p = this.create();
+			if(p != null) {
+				this.parts.push(p);
+			}
+		}
+		
+		//update
+		for(var i=0; i<this.parts.length; i++) {
+			this.update(this.parts[i]);
+		}
+		
+		//draw
+		ctx.save();
+		for(var i=0; i<this.parts.length; i++) {
+			this.render(ctx,this.parts[i]);
+		}
+		ctx.restore();
+		
+		//destroy / recycle
+		for(var i=0; i<this.parts.length; i++) {
+			this.recycle(this.parts[i]);
+		}
+		this.tick++;
+	};
+}
+ParticleSimulator.extend(AminoNode);
+
+
+var engine = new Amino();
+engine.autoPaint = true;
+var canvas = engine.addCanvas("sim");
+canvas.setTransparent(true);
+//canvas.add(new Rect().set(0,0,50,50).setFill("red"));
+
+
+var sim = new ParticleSimulator();
+sim.max = 10;
+var rate = 10;
+sim.create = function() {
+	if(this.tick % (60*4) != 0) return null;
+	return { 
+		  x:30+Math.random()*190,
+		  y:500,
+		  v: 2+Math.random()*2 
+		}
+};
+sim.update = function(p) {
+	p.y -= p.v/8.6;
+};
+sim.render = function(ctx,p) {
+	ctx.fillStyle = "white";
+	ctx.globalAlpha = 0.9;
+	ctx.beginPath();
+	ctx.arc(p.x,p.y,p.v*7,0,360);
+	ctx.closePath();
+	ctx.fill();
+	ctx.globalAlpha = 1.0;
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "white";
+	ctx.stroke();
+	console.log("repainting");
+} 
+sim.recycle = function(p) {
+	if(p.y < -30) p.y = 500;
+} 
+canvas.add(sim);
+
+canvas.autoSize = false;
+engine.start();
+
+window.ebook.unloaders.push(function() {
+    console.log('stopping the engine');
+    engine.stop();
+});
+
+</script>
+
+</body>
+
+</html>
