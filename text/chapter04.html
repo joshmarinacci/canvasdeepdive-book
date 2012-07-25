@@ -12,7 +12,7 @@
 <div id="content">
 
 
-<h3><a id="settimeout">Animating with setInterval()</a></h3>
+<h3><a id="settimeout">Animating with requestAnimationFrame</a></h3>
 
 <p>Now that we know how to draw lots of cool things, lets animate them. The
 first thing to know about animation is that it's just drawing the same thing
@@ -21,27 +21,48 @@ the screen. If you want to animate something, just wait a few milleseconds and
 draw it again. Now of course you don't want to sit in a busy loop since that
 would block the browser. Instead you should draw something then ask the browser
 to call you back in a few milliseconds. The easiest way to do this is with the
-JavaScript setInterval function. It will call your drawing function every N
-msec. Lets try a simple example where we animate a rectangle across the
+JavaScript setInterval() function. It will call your drawing function every N
+msec.</p>
+
+<p>However, we should never actually use setInterval. setInterval will always draw at the same speed, regardless of what kind of computer the user has, whatever else the user is doing, and whether or not the page is currently in the foreground. In short, it works but it isn't efficient. Instead we should use a newer API requestAnimationFrame.</p>
+
+<p>requestAnimationFrame was created to make animation smooth and power efficient. You call it with a reference to your drawing function. At some time in the future the browser will call your drawing function when <i>the browser</i> is ready. This gives the browser complete control over drawing so it can lower the framerate when needed. It also can make the animation smoother by locking it to the 60 frames per second refresh rate of the screen.  To make requestAnimationFrame a loop just call it recursively as the first thing.</p>
+
+<p>requestAnimationFrame is becoming a standard but most browser only support their own prefixed version of it. For example, Chrome uses webkitRequestAnimationFrame and Mozilla supports mozRequestAnimationFrame.  To fix this we will use <a href='http://paulirish.com/2011/requestanimationframe-for-smart-animating/'>Paul Irish's shim script</a>. This just maps the different variations to a new function: <code>requestAnimFrame</code>.</p>
+
+<pre><code>// shim layer with setTimeout fallback
+window.requestAnimFrame = (function(){
+  return  window.requestAnimationFrame       || 
+          window.webkitRequestAnimationFrame || 
+          window.mozRequestAnimationFrame    || 
+          window.oRequestAnimationFrame      || 
+          window.msRequestAnimationFrame     || 
+          function( callback ){
+            window.setTimeout(callback, 1000 / 60);
+          };
+})();</code></pre>
+
+
+<p>Lets try a simple example where we animate a rectangle across the
 screen.</p>
 
 <pre><code>var x = 0;
 function drawIt() {
+    window.requestAnimFrame(drawIt);
     var canvas = document.getElementById('canvas');
     var c = canvas.getContext('2d');
     c.fillStyle = &quot;red&quot;;
     c.fillRect(x,100,200,100);
     x+=5;
 }
-
-setInterval(drawIt, 100);</code></pre>
+window.requestAnimFrame(drawIt);
+</code></pre>
 
 <div class='photo'>
     <a class='examplelink noborder' href="examples/setinterval1.html"><img src="examples/setinterval1.png"/></a>
-    <p><b>interactive</b> setInterval() example</p>
-    <p><i>basic animated rectangle using setInterval (click to run)</i></p>
+    <p><b>interactive</b> requestAnimFrame() example</p>
+    <p><i>basic animated rectangle using requestAnimFrame (click to run)</i></p>
 </div>
-
 
 
 <h3><a id="clearbackground">Clearing the background</a></h3>
@@ -51,6 +72,7 @@ setInterval(drawIt, 100);</code></pre>
 
 <pre><code>var x = 0;
 function drawIt() {
+    window.requestAnimFrame(drawIt);
     var canvas = document.getElementById('canvas');
     var c = canvas.getContext('2d');
     <b>c.clearRect(0,0,canvas.width,canvas.height);</b>
@@ -59,11 +81,11 @@ function drawIt() {
     x+=5;
 }
 
-setInterval(drawIt, 100);</code></pre>
+window.requestAnimFrame(drawIt);</code></pre>
 
 <div class='photo'>
     <a class='examplelink noborder' href="examples/setinterval2.html"><img src="examples/setinterval2.png"/></a>
-    <p><b>interactive</b> setInterval() example</p>
+    <p><b>interactive</b> requestAnimFrame example</p>
     <p><i>drawing rectangle with background clearing (click to run)</i></p>
 </div>
 
@@ -82,12 +104,13 @@ setInterval(drawIt, 100);</code></pre>
 var particles = [];
 var tick = 0;
 function loop() {
+    window.requestAnimFrame(loop);
     createParticles();
     updateParticles();
     killParticles();
     drawParticles();
 }
-setInterval(loop,30);</code></pre>
+window.requestAnimFrame(loop);</code></pre>
 
 <p>First we will create the essence of a particle simulator. It's a loop function that is called every 30 ms. The only data structure we need is an empty array of particles and a clock tick counter. Every time through the loop it will execute the four parts.</p>
 

@@ -9,15 +9,28 @@ body { padding: 0; margin: 0; }
 <canvas width="650" height="650" id="canvas"></canvas>
 <script>
 
+// shim layer with setTimeout fallback
+window.requestAnimFrame = (function(){
+  return  window.requestAnimationFrame       || 
+          window.webkitRequestAnimationFrame || 
+          window.mozRequestAnimationFrame    || 
+          window.oRequestAnimationFrame      || 
+          window.msRequestAnimationFrame     || 
+          function( callback ){
+            window.setTimeout(callback, 1000 / 60);
+          };
+})();
+
 var x = 0;
 function drawIt() {
+    window.requestAnimFrame(drawIt);
     var canvas = document.getElementById('canvas');
     var c = canvas.getContext('2d');
     c.fillStyle = "red";
     c.fillRect(x,100,200,100);
     x+=5;
 }
-setInterval(drawIt, 100);
+window.requestAnimFrame(drawIt);
 </script>
 </body>
 </html>
