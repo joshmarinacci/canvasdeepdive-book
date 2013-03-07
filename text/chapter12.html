@@ -153,7 +153,7 @@ function play() {
     src.noteOn(0);
 }</code></pre>
 
-<p>You can try the demo <a href='#'>here</a>. Each time you press the button it will play a short laser sound. (courtesy of <a href='http://www.freesound.org/people/inferno/sounds/18379/'>inferno on freesound.org</a> If you press the button quickly you will hear that sounds stack up and overlap correctly. We don't have to do anything special to make this happen. Web Audio handles it automatically. In a game we could call the play function every time a character fires their gun. If four players fire at the same time the right thing will happen.</p>
+<p>You can try the demo <a href='../canvasdeepdive-examples/WebAudio/FFT/effects.html'>here</a>. Each time you press the button it will play a short laser sound. (courtesy of <a href='http://www.freesound.org/people/inferno/sounds/18379/'>inferno on freesound.org</a> If you press the button quickly you will hear that sounds stack up and overlap correctly. We don't have to do anything special to make this happen. Web Audio handles it automatically. In a game we could call the play function every time a character fires their gun. If four players fire at the same time the right thing will happen.</p>
 
 <p>We can also create new sounds by purposely overlapping sounds. The noteOn() function takes a timestamp to play the sound, in seconds.  To create a new sound we can play the laser clip four times, each time offset by 1/4th of a second. Thus they will overlap cleanly, creating a new effect.</p>
 
@@ -170,7 +170,7 @@ function play() {
 
 <p>Note we have to add the current time from the audio context to the offset to get the final time for each clip.</p>
 
-<p>Try out the final version <a href='#'>here</a></p>
+<p>Try out the final version <a href='../canvasdeepdive-examples/WebAudio/FFT/effects.html'>here</a></p>
 
 <h3><a id='visualization'>Audio Visualization</a></h3>
 
@@ -288,7 +288,7 @@ function setupCanvas() {
 
 <div class="photo">
 	<img src="images/webaudio_bars.png"/>
-	<p><b>demo</b>Music Bars (<a href='#'>run</a>)</p>
+	<p><b>demo</b>Music Bars (<a href='../canvasdeepdive-examples/WebAudio/FFT/test2.html'>run</a>)</p>
 	<p><i>rectangles drawn from 128 realtime FFT samples</i></p>
 </div>
 
@@ -297,7 +297,7 @@ function setupCanvas() {
 
 <div class="photo">
 	<img src="images/webaudio_blur.png"/>
-	<p><b>demo</b>WinAMP style visualizer (<a href='#'>run</a>)</p>
+	<p><b>demo</b>WinAMP style visualizer (<a href='../canvasdeepdive-examples/WebAudio/FFT/blur.html'>run</a>)</p>
 	<p><i>lines drawn from 128 realtime FFT samples, with stretch copying</i></p>
 </div>
 
