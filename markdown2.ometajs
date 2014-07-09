@@ -1,0 +1,241 @@
+var block_tags = {
+    'p':'p',
+    'ul':'ul',
+    'li':'li',
+    'h1':'h1',
+    'h2':'h2',
+    'h3':'h3',
+    'codeblock':'codeblock'
+}
+
+var inline_tags = {
+    'b':'b',
+    'i':'i',
+    'code':'code'
+}
+
+var inside = {};
+var linkmap = {};
+var sections = {};
+
+var buffer = "";
+function open(tag) {
+    if(tag == 'codeblock') {
+        buffer += '<pre><code>';
+        return;
+    }
+    buffer += "<"+tag+">";
+}
+function close(tag) {
+    if(tag == 'codeblock') {
+        buffer += '</code></pre>';
+        return;
+    }
+    buffer += "</"+tag+">";
+}
+function append(text) {  buffer += text; }
+
+function closeAll() {
+    for(var elem in block_tags) {
+        if(inside[elem]) {
+            buffer += '\n';
+            close(elem);
+            inside[elem] = false;
+            buffer += '\n';
+        }
+    };
+    for(var elem in inline_tags) {
+        if(inside[elem]) {
+            close(elem);
+            inside[elem] = false;
+        }
+    };
+}
+function endBody(y) {
+    closeAll();
+    return {
+        content: buffer.toString(),
+        sections: sections,
+        linkmap: linkmap
+    }
+}
+function toggle(n) {
+    if(!inside[n]) {
+        inside[n] = false;
+    }
+
+    if(inside[n]) {
+        inside[n] = false;
+        close(n);
+    } else {
+        inside[n] = true;
+        open(n);
+    }
+}
+
+function toggleBlock(n) {
+    if(!inside[n]) {
+        inside[n] = false;
+    }
+    if(inside[n]) {
+        inside[n] = false;
+        close(n);
+    } else {
+        inside[n] = true;
+        open(n);
+    }
+}
+
+function openBlock(n) {
+    closeAll();
+    inside[n] = true;
+    buffer += '\n';
+    open(n);
+}
+
+function closeBlock(n) {
+    close(n);
+    buffer += '\n';
+    inside[n] = false;
+}
+
+function header(level, text) {
+    var id = 'id'+Math.floor(Math.random()*100000);
+    sections[id] = {
+        level: level,
+        text: text
+    };
+    openBlock('h'+level); append(text); closeBlock('h'+level);
+}
+
+function insertInlineLink(text, href) {
+    append("<a href='"+href+"'>");
+    append(text);
+    close('a');
+}
+function insertReferenceLink(text, ref) {
+    append("<a href='#' id='"+ref+"'>");
+    append(text);
+    close('a');
+}
+function fillReferenceLink(id, link) {
+    linkmap[id] = link;
+}
+
+function insertInlineImage(text, href,cname) {
+    if(Markdown.classProcessors[cname]) {
+        Markdown.classProcessors[cname](append, text, href);
+        return;
+    }
+    append("<img src='"+href+"' alt='"+text+"'");
+    if(cname) {
+        append(" class='"+cname+"'");
+    }
+    append("/>");
+}
+
+function escapeRegExp(string) {
+    return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
+function replaceAll(string, find, replace) {
+  return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+}
+
+function insertCodeBlock(text, params) {
+    closeAll();
+    append("<pre><code>");
+    append(replaceAll(text,'<','&lt;'));
+    append("</code></pre>");
+}
+
+function insertCustomBlock(params) {
+    //console.log("custom block = ",params);
+    //console.log("type = ", params.type);
+    /*
+    if(Markdown.customProcessors[params.type]) {
+        Markdown.customProcessors[params.type](append, obj);
+        return;
+    }*/
+}
+
+function listItem(text) {
+    if(!inside['ul']) openBlock('ul');
+    append("<li>"+text+"</li>\n");
+}
+
+
+export ometa Markdown {
+    nonEOL    = (~'\n' anything):x -> x,
+    toEOL     = (~'\n' anything)*:x '\n' -> x.join(""),
+    uptoEOL   = (~'\n' anything)*:x -> x.join(""),
+    ws        = (' ')*,
+    ws2       = (' '|'\n')*,
+    word      = (letter | digit)+:x -> x.join(""),
+    EOL       = '\n',
+    pairB     = '[' (~']' anything)*:x ']' -> x.join(""),
+    pairP     = '(' (~')' anything)*:x ')' -> x.join(""),
+    classname = '.' word:clss -> clss,
+    keyvaluepair = ws2 word:key ws2 ':' ws2 uptoEOL:value '\n' -> {return {key:key,value:value} },
+    keyvaluepairs = (keyvaluepair)+:kvps,
+
+    //block styles
+    elem      = '\n' '*' ws uptoEOL:text -> listItem(text),
+    elem      = '\n' "{" JSONish.start:out "}" -> insertCustomBlock(out),
+    elem      = "```" toEOL:params (~"```" anything)+:text "```" -> insertCodeBlock(text.join(''),params),
+    elem      = ~'\n' '#' '#' '#' ws uptoEOL:text -> header(1,text),
+    elem      = ~'\n' '#' '#' ws uptoEOL:text -> header(2,text),
+    elem      = ~'\n' '#' ws uptoEOL:text -> header(3,text),
+    elem      = ~'\n' '[' word:id ']' ':' toEOL:link -> fillReferenceLink(id, link),
+    //inline styles
+    elem      = '*' -> toggle('b'),
+    elem      = '_' -> toggle('i'),
+    elem      = '`' -> toggle('code'),
+    elem      = '!' pairB:title pairP:link classname?:cname -> insertInlineImage(title,link,cname),
+    elem      = pairB:title pairP:link -> insertInlineLink(title,link),
+    elem      = pairB:title pairB:link -> insertReferenceLink(title,link),
+    elem      = EOL &EOL -> openBlock('p'),
+
+    //plain text
+    elem      = anything:x -> append(x),
+    start     =  elem+ anything*:y -> endBody(y)
+}
+
+Markdown.reset = function() {
+    buffer = "";
+    inside = {};
+    linkmap = {};
+    sections = {};
+}
+
+Markdown.classProcessors = {};
+Markdown.customProcessors = {};
+
+function smoosh(arr) {
+    console.log('arry = ',arr);
+    var obj = {};
+    arr.forEach(function(kv){
+        console.log("kv = ",kv);
+        obj[kv[0]] = kv[1];
+    });
+}
+
+export ometa JSONish {
+    word      = letter+:x -> x.join(''),
+    qstring   = ws '"' (~'"' anything)*:x '"' -> x.join(''),
+    ws        = (' '|'\n')*,
+    key       = word,
+    object    = qstring:t ',' ws -> t,
+    array     = "[" object*:vals "]" -> vals,
+
+    value     = qstring,
+    value     = ws array:arr ws -> arr,
+    value     = ws "{" keypair*:pairs "}" -> pairs,
+
+    keypair   =  ws key:k ":" value:v ','? -> [k,v],
+    start     =  "{" keypair+:kps ws "}" -> smoosh(kps)
+}
+
+
+
+//foo

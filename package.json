@@ -1,0 +1,27 @@
+{
+  "name": "canvasdeepdive-book",
+  "version": "0.0.0",
+  "description": "scripts to build the HTML Canvas Deep Dive webbook",
+  "main": "test3.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/joshmarinacci/canvasdeepdive-book.git"
+  },
+  "keywords": [
+    "canvas"
+  ],
+  "author": "joshua@marinacci.org",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/joshmarinacci/canvasdeepdive-book/issues"
+  },
+  "homepage": "https://github.com/joshmarinacci/canvasdeepdive-book",
+  "dependencies": {
+    "bootstrap": "^3.2.0",
+    "mustache": "^0.8.2",
+    "ometa-js": "^1.3.2"
+  }
+}
