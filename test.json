@@ -1,0 +1,15 @@
+{
+    type: "gallery",
+    title: "Apps made with HTML Canvas",
+    foo : {
+        blah:"qux",
+    },
+    images: [
+        "images/screenshot1.png",
+        "images/screenshot2.png",
+        "images/screenshot3.png",
+        "images/screenshot4.png",
+        "images/screenshot5.png",
+        "images/screenshot6.png",
+    ]
+}

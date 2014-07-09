@@ -62,12 +62,12 @@ function drawIt() {
 window.requestAnimFrame(drawIt);
 ```
 
-{
-    type: interactive
-    href: examples/setinterval1.html
-    image: examples/setinterval1.png
-    text: basic animated rectangle using requestAnimFrame (click to run)
-}
+{{
+    type: "interactive"
+    href: "examples/setinterval1.html"
+    image: "examples/setinterval1.png"
+    text: "basic animated rectangle using requestAnimFrame (click to run)"
+}}
 
 ## Clearing the background
 
@@ -94,12 +94,12 @@ function drawIt() {
 window.requestAnimFrame(drawIt);
 ```
 
-{
-    type: interactive
-    href: examples/setinterval2.html
-    image: examples/setinterval2.png
-    text: drawing rectangle with background clearing (click to run)
-}
+{{
+    type: "interactive"
+    href: "examples/setinterval2.html"
+    image: "examples/setinterval2.png"
+    text: "drawing rectangle with background clearing (click to run)"
+}}
 
 ## Particle Simulator
 
@@ -213,12 +213,12 @@ then draw a circle with the current particle's x, y, radius, and color.
 
 Now here's what it looks like:
 
-{
-    type: interactive
-    href: examples/snowsim.html
-    image: examples/snowsim.png
-    text: Particle simulation of snow falling
-}
+{{
+    type: "interactive"
+    href: "examples/snowsim.html"
+    image: "examples/snowsim.png"
+    text: "Particle simulation of snow falling"
+}}
 
 
 What I love about particle simulators is that you can create very complicated
@@ -295,12 +295,12 @@ number. Then draw the image and update the tick counter.  Of course this might
 go too fast, so you could divide the tick by 2 or 3 before the mod to make it
 run slower.
 
-{
-    type:  interactive
-    href:  examples/spriteanim.html
-    image: examples/spriteanim.png
-    text:  Animation through ten frames, magnified for detail
-}
+{{
+    type:  "interactive"
+    href:  "examples/spriteanim.html"
+    image: "examples/spriteanim.png"
+    text:  "Animation through ten frames, magnified for detail"
+}}
 
 In the next chapter we will build a simple game.  This game will demonstrate how
 to use basic and sprite animation, keyboard events, and a simple particle

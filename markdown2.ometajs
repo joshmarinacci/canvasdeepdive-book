@@ -151,12 +151,11 @@ function insertCodeBlock(text, params) {
 
 function insertCustomBlock(params) {
     //console.log("custom block = ",params);
-    //console.log("type = ", params.type);
-    /*
+    console.log("type = ", params.type);
     if(Markdown.customProcessors[params.type]) {
-        Markdown.customProcessors[params.type](append, obj);
+        Markdown.customProcessors[params.type](append, params);
         return;
-    }*/
+    }
 }
 
 function listItem(text) {
@@ -212,12 +211,11 @@ Markdown.classProcessors = {};
 Markdown.customProcessors = {};
 
 function smoosh(arr) {
-    console.log('arry = ',arr);
     var obj = {};
     arr.forEach(function(kv){
-        console.log("kv = ",kv);
         obj[kv[0]] = kv[1];
     });
+    return obj;
 }
 
 export ometa JSONish {
@@ -230,7 +228,7 @@ export ometa JSONish {
 
     value     = qstring,
     value     = ws array:arr ws -> arr,
-    value     = ws "{" keypair*:pairs "}" -> pairs,
+    value     = ws "{" keypair*:pairs "}" -> smoosh(pairs),
 
     keypair   =  ws key:k ":" value:v ','? -> [k,v],
     start     =  "{" keypair+:kps ws "}" -> smoosh(kps)

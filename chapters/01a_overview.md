@@ -25,6 +25,9 @@ These screenshots give you just a taste of what is possible with Canvas.
     ]
 }}
 
+{{
+    type: "foo",
+}}
 
 
 ## What is Canvas?
