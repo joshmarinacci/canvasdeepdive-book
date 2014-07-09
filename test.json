@@ -11,5 +11,16 @@
         "images/screenshot4.png",
         "images/screenshot5.png",
         "images/screenshot6.png",
-    ]
+    ],
+    type: "jangle",
+    id: "drawrect",
+    width: "400",
+    height: "100",
+    defaultValues: {
+        var1: 20,
+        var2: "30",
+        var3: "40",
+        var4: "50"
+    }
+
 }

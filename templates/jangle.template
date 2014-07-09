@@ -1,0 +1,76 @@
+<div class='panel panel-success interactive jangle' id='{{id}}' >
+    <div class='panel-heading'>
+        <b style='font-size:90%'>INTERACTIVE</b> Drag red numbers left and right to change them
+    </div>
+    <div class='panel-body'>
+        <div class='row'>
+            <div class='col-sm-6'>
+                <pre><code>{{{htmlcode}}}</code></pre>
+        </div>
+        <div class='col-sm-6'>
+            <canvas width={{width}} height={{height}}></canvas>
+            <script type='text/javascript'>
+            (function f() {
+                var params = {{{paramStruct}}};
+
+                function drawIt(var1, var2, var3, var4) {
+                    var canvas = $("#{{id}} canvas")[0];
+                    var ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#eee';
+                    ctx.fillRect(0,0,{{width}},{{height}});
+                    {{{rawcode}}};
+                }
+
+                var root = $("#{{id}}");
+
+                var start = {x:-1,y:-1, dragging:false};
+
+                function startDragValue(e)  {
+                    e.preventDefault();
+                    var dom = $(this);
+                    var name = dom.attr('class');
+                    $(window).mousemove(function(e) {
+                        if(start.dragging) {
+                            var dx = e.pageX - start.x;
+                            var dy = e.pageY - start.y;
+                            start.x = e.pageX;
+                            start.y = e.pageY;
+                            if(dx < 0 || dx > 0) {
+                                params[name] = parseInt(params[name]) + dx;
+                                dom.text(params[name]+'');
+                                invokeDrawFunction();
+                            }
+                        } else {
+                            start.x = e.pageX;
+                            start.y = e.pageY;
+                            start.dragging = true;
+                        }
+                    });
+                    $(window).mouseup(function(e) {
+                        start.dragging = false;
+                        $(window).unbind("mousemove");
+                    });
+                }
+
+
+                function invokeDrawFunction() {
+                    var args = [];
+                    for(var n in params) {
+                        args.push(parseInt(params[n]));
+                    }
+                    drawIt.apply(null,args);
+                }
+
+                for(var name in params) {
+                    var val = parseInt(params[name]);
+                    $(root).find('pre code i.'+name).text(''+val);
+                    $(root).find('pre code i.'+name).mousedown(startDragValue);
+                }
+
+                invokeDrawFunction();
+            })();
+            </script>
+        </div>
+    </div>
+    </div>
+</div>

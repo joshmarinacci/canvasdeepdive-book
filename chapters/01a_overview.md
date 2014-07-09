@@ -25,10 +25,6 @@ These screenshots give you just a taste of what is possible with Canvas.
     ]
 }}
 
-{{
-    type: "foo",
-}}
-
 
 ## What is Canvas?
 
@@ -45,9 +41,9 @@ code looks like:
   <canvas width="800" height="600" id="canvas"></canvas>
   <script>
     var canvas = document.getElementById('canvas');
-    var c = canvas.getContext('2d');
-    c.fillStyle = "red";
-    c.fillRect(100,100,400,300);
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = "red";
+    ctx.fillRect(100,100,400,300);
   </script>
 </body>
 </html>
@@ -129,27 +125,51 @@ then draw some shapes.  Here are a few of examples.
 In this example we set the current color to red and draw a rectangle. *Drag  the
 numbers in the code to change the values and see how it affects the rectangle*
 
-``` canvasdemo 400x100
+``` drawrect
 ctx.fillStyle = "red";
 //x, y, width, height
 ctx.fillRect(var1,var2,var3,var4);
 ```
 
+{{
+    type: "jangle",
+    id: "drawrect",
+    width: "300",
+    height: "100",
+    defaultValues: {
+        var1: "25",
+        var2: "25",
+        var3: "100",
+        var4: "50"
+    }
+}}
+
 Here's another one.
 
-``` canvasdemo 400x100
-c.fillStyle = '#ccddff';
-c.beginPath();
-c.moveTo(50,20);
-c.lineTo(200,50);
-c.lineTo(var1,var2);
-c.closePath();
-c.fill();
-c.strokeStyle = 'rgb(0,128,0)';
-c.lineWidth = var3;
-c.stroke();
+``` drawpath
+ctx.fillStyle = '#ccddff';
+ctx.beginPath();
+ctx.moveTo(50,20);
+ctx.lineTo(200,50);
+ctx.lineTo(var1,var2);
+ctx.closePath();
+ctx.fill();
+ctx.strokeStyle = 'rgb(0,128,0)';
+ctx.lineWidth = var3;
+ctx.stroke();
 ```
 
+{{
+    type: "jangle",
+    id: "drawpath",
+    width: "300",
+    height: "200",
+    defaultValues: {
+        var1: "150",
+        var2: "80",
+        var3: "5",
+    }
+}}
 
 In this example we set the current fill color, create a path, then fill and
 stroke it. Note that the context keeps track of the fill color and the stroke
@@ -169,19 +189,33 @@ define each line segment with functions like `moveTo()`, `lineTo()`, and
 bezier curve segment, then some lines. After creating the path it fills and
 strokes it.
 
-``` canvasdemo 300x100
-c.fillStyle = 'red';
-c.beginPath();
-c.moveTo(10,30);
-c.bezierCurveTo(varcx1,varcy1,varcx2,varcy2,200,30);
-c.lineTo(200,90);
-c.lineTo(10,90);
-c.closePath();
-c.fill();
-c.lineWidth = 4;
-c.strokeStyle = 'black';
-c.stroke();
+``` pathexample
+ctx.fillStyle = 'red';
+ctx.beginPath();
+ctx.moveTo(10,30);
+ctx.bezierCurveTo(var1,var2, var3,var4,200,30);
+ctx.lineTo(200,90);
+ctx.lineTo(10,90);
+ctx.closePath();
+ctx.fill();
+ctx.lineWidth = 4;
+ctx.strokeStyle = 'black';
+ctx.stroke();
 ```
+
+
+{{
+    type: "jangle",
+    id: "pathexample",
+    width: "300",
+    height: "200",
+    defaultValues: {
+        var1: "50",
+        var2: "90",
+        var3: "159",
+        var4: "-30",
+    }
+}}
 
 
 ## Coordinate System
@@ -208,22 +242,41 @@ scale, or stretch and slice it how you like. Slicing and stretching images can
 be very handy for special effects in games because image interpolation is often
 much faster than other ways kinds of scaling.
 
-```canvasdemo 400x100
+```imageexample
 var img = new Image();
 img.onload = function() {
-function drawit(ctx,var1,var2,s1,s2,s3,s4) {
 ctx.drawImage(img, 0,0); //normal drawing
 ctx.drawImage(img, //draw stretched
-    0,0,66,66, //source (x,y,w,h)
-    100,0,var1,var2//destination (x,y,w,h)
+    //source (x,y,w,h)
+    0,0,66,66,
+    //destination (x,y,w,h)
+    100,0,var1,var2
     );
 ctx.drawImage(img, //draw a slice
-    s1,s2,s3,s4, //source coords (x,y,w,h)
-    250,0,250,50//destination coords (x,y,w,h)
+    //source coords (x,y,w,h)
+    var3,var4,var5,var6,
+    //destination coords (x,y,w,h)
+    250,0,250,50
     );
 }
 img.src = 'images/smile.png';
 ```
+
+{{
+    type: "jangle",
+    id: "imageexample",
+    width: "300",
+    height: "200",
+    defaultValues: {
+        var1: 100,
+        var2: 100,
+        var3: 20,
+        var4: 10,
+        var5: 20
+        var6: 20
+    }
+}}
+
 
 Try changing the variables to see how stretching and slicing works. To stretch
 an image you must specify the source and destination coordinates. The source
@@ -246,11 +299,23 @@ equivalent, so you can set the style, size, and font family. Note that the
 text, not the top. If you put your text at 0,0 then it will be drawn off the top
 of the screen. Be sure to lower the y by an appropriate amount.
 
-``` canvasdemo 400x100
+``` textexample
 ctx.fillStyle = "black";
 ctx.font = "italic "+var1+"pt Arial ";
-ctx.fillText("this is text", var2,var3);
+ctx.fillText("Awesome Sauce", var2,var3);
 ```
+
+{{
+    type: "jangle",
+    id: "textexample",
+    width: "300",
+    height: "200",
+    defaultValues: {
+        var1: 48,
+        var2: 20,
+        var3: 150,
+    }
+}}
 
 
 
@@ -260,8 +325,13 @@ Canvas can also fill shapes with gradients instead of colors. Here's a linear
 gradient:
 
 
-``` canvasdemo 400x200
-var grad = ctx.createLinearGradient(0,0,var1,var2);
+``` gradient1
+var grad = ctx.createLinearGradient(
+    0, //x
+    0, //y
+    var1, //width
+    var2 // height
+    );
 grad.addColorStop(0, "white");
 grad.addColorStop(0.5, "red");
 grad.addColorStop(1, "black");
@@ -270,14 +340,30 @@ ctx.fillStyle = grad;
 ctx.fillRect(0,0,400,200);
 ```
 
+{{
+    type: "jangle",
+    id: "gradient1",
+    width: "300",
+    height: "200",
+    defaultValues: {
+        var1: 200,
+        var2: 0,
+    }
+}}
+
 An important thing to notice here is that gradient is painted in the coordinate
 system that the shape is drawn in, not the internal coordinates of the shape. In
 this example the shape is drawn at 0,0. If we changed the shape to be at 100,100
 the gradient would still be in the origin of the screen, so less of the gradient
 would be drawn, like this:
 
-``` canvasdemo 400x200
-    var grad = ctx.createLinearGradient(0,0,var1,var2);
+``` gradient2
+    var grad = ctx.createLinearGradient(
+        0,    // x
+        0,    // y
+        var1, // width
+        var2   // height
+        );
     grad.addColorStop(0, "white");
     grad.addColorStop(0.5, "red");
     grad.addColorStop(1, "black");
@@ -285,6 +371,18 @@ would be drawn, like this:
     ctx.fillStyle = grad;
     ctx.fillRect(100,100,400,200);
 ```
+
+{{
+    type: "jangle",
+    id: "gradient2",
+    width: "300",
+    height: "200",
+    defaultValues: {
+        var1: 200,
+        var2: 0,
+    }
+}}
+
 
 So if you get into a case where you think you are filling a shape with a
 gradient but only see a single color, it might be because your coordinates are

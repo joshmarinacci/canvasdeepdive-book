@@ -2,7 +2,7 @@
   "name": "canvasdeepdive-book",
   "version": "0.0.0",
   "description": "scripts to build the HTML Canvas Deep Dive webbook",
-  "main": "test3.js",
+  "main": "build.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -36,6 +36,36 @@ MD.customProcessors['interactive'] = function(append, params) {
     append("</div>");
 }
 
+MD.customProcessors['jangle'] = function(append, params) {
+    console.log("jangle params",params);
+    console.log("code block = ", MD.codeblocks[params.id]);
+
+    params.code = MD.codeblocks[params.id];
+    var htmlcode = params.code;
+    var rawcode  = params.code;
+    htmlcode = htmlcode.replace(/(var\d)/g,'<i class="$1"></i>');
+
+    var dvals = [];
+    var paramNames = [];
+    for(var name in params.defaultValues) {
+        var val = params.defaultValues[name];
+        console.log("name = ",name,val);
+        htmlcode = htmlcode.replace('value'+name,val);
+        dvals.push(val);
+        paramNames.push(name);
+    }
+
+    params.htmlcode = htmlcode;
+    params.rawcode  = rawcode;
+    params.drawCall = 'drawIt(ctx,'+dvals.join(',')+');';
+    params.paramNames = '"'+paramNames.join('","')+'"';
+    params.paramStruct = JSON.stringify(params.defaultValues);
+
+    var template = fs.readFileSync('templates/jangle.template').toString();
+    append(Mustache.render(template,params));
+
+}
+
 
 var files = [
     '01a_overview.md',

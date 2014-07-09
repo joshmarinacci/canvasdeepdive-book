@@ -142,11 +142,15 @@ function replaceAll(string, find, replace) {
   return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
 }
 
-function insertCodeBlock(text, params) {
+function insertCodeBlock(text, id,params) {
     closeAll();
-    append("<pre><code>");
-    append(replaceAll(text,'<','&lt;'));
-    append("</code></pre>");
+    if(id) {
+        Markdown.codeblocks[id] = text;
+    } else {
+        append("<pre><code>");
+        append(replaceAll(text,'<','&lt;'));
+        append("</code></pre>");
+    }
 }
 
 function insertCustomBlock(params) {
@@ -181,7 +185,7 @@ export ometa Markdown {
     //block styles
     elem      = '\n' '*' ws uptoEOL:text -> listItem(text),
     elem      = '\n' "{" JSONish.start:out "}" -> insertCustomBlock(out),
-    elem      = "```" toEOL:params (~"```" anything)+:text "```" -> insertCodeBlock(text.join(''),params),
+    elem      = "```" ws (word)?:id toEOL:params (~"```" anything)+:text "```" -> insertCodeBlock(text.join(''),id,params),
     elem      = ~'\n' '#' '#' '#' ws uptoEOL:text -> header(1,text),
     elem      = ~'\n' '#' '#' ws uptoEOL:text -> header(2,text),
     elem      = ~'\n' '#' ws uptoEOL:text -> header(3,text),
@@ -209,6 +213,7 @@ Markdown.reset = function() {
 
 Markdown.classProcessors = {};
 Markdown.customProcessors = {};
+Markdown.codeblocks = {};
 
 function smoosh(arr) {
     var obj = {};
@@ -219,18 +224,20 @@ function smoosh(arr) {
 }
 
 export ometa JSONish {
-    word      = letter+:x -> x.join(''),
+    word      = (letter|digit)+:x -> x.join(''),
+    number    = digit+:x -> x.join(''),
     qstring   = ws '"' (~'"' anything)*:x '"' -> x.join(''),
     ws        = (' '|'\n')*,
     key       = word,
     object    = qstring:t ',' ws -> t,
     array     = "[" object*:vals "]" -> vals,
 
-    value     = qstring,
-    value     = ws array:arr ws -> arr,
-    value     = ws "{" keypair*:pairs "}" -> smoosh(pairs),
+    value     = (digit+):x -> x.join(''), // number
+    value     = qstring,                  // quoted string
+    value     = ws array:arr ws -> arr,   // array of values
+    value     = ws "{" keypair*:pairs "}" -> smoosh(pairs), // key value pairs
 
-    keypair   =  ws key:k ":" value:v ','? -> [k,v],
+    keypair   =  ws key:k ":" ws value:v ','? -> [k,v],
     start     =  "{" keypair+:kps ws "}" -> smoosh(kps)
 }
 
