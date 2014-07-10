@@ -5,8 +5,10 @@ var files = [
     '04a_animation.md',
     //'05a_gaming1.md',
     '05b_gaming2.md',
+    '05c_gaming3.md',
     '12a_intro_audio.md',
     '12b_deep_audio.md',
+    '12c_game_audio.md',
     '13a_gameinput.md',
     ];
 

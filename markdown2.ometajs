@@ -18,121 +18,10 @@ var inside = {};
 var linkmap = {};
 var sections = {};
 
-var buffer = "";
-function open(tag) {
-    if(tag == 'codeblock') {
-        buffer += '<pre><code>';
-        return;
-    }
-    buffer += "<"+tag+">";
-}
-function close(tag) {
-    if(tag == 'codeblock') {
-        buffer += '</code></pre>';
-        return;
-    }
-    buffer += "</"+tag+">";
-}
-function append(text) {  buffer += text; }
-
-function closeAll() {
-    for(var elem in block_tags) {
-        if(inside[elem]) {
-            buffer += '\n';
-            close(elem);
-            inside[elem] = false;
-            buffer += '\n';
-        }
-    };
-    for(var elem in inline_tags) {
-        if(inside[elem]) {
-            close(elem);
-            inside[elem] = false;
-        }
-    };
-}
-function endBody(y) {
-    closeAll();
-    return {
-        content: buffer.toString(),
-        sections: sections,
-        linkmap: linkmap
-    }
-}
-function toggle(n) {
-    if(!inside[n]) {
-        inside[n] = false;
-    }
-
-    if(inside[n]) {
-        inside[n] = false;
-        close(n);
-    } else {
-        inside[n] = true;
-        open(n);
-    }
-}
-
-function toggleBlock(n) {
-    if(!inside[n]) {
-        inside[n] = false;
-    }
-    if(inside[n]) {
-        inside[n] = false;
-        close(n);
-    } else {
-        inside[n] = true;
-        open(n);
-    }
-}
-
-function openBlock(n) {
-    closeAll();
-    inside[n] = true;
-    buffer += '\n';
-    open(n);
-}
-
-function closeBlock(n) {
-    close(n);
-    buffer += '\n';
-    inside[n] = false;
-}
-
-function header(level, text) {
-    var id = 'id'+Math.floor(Math.random()*100000);
-    sections[id] = {
-        level: level,
-        text: text
-    };
-    openBlock('h'+level); append(text); closeBlock('h'+level);
-}
-
-function insertInlineLink(text, href) {
-    append("<a href='"+href+"'>");
-    append(text);
-    close('a');
-}
-function insertReferenceLink(text, ref) {
-    append("<a href='#' id='"+ref+"'>");
-    append(text);
-    close('a');
-}
 function fillReferenceLink(id, link) {
     linkmap[id] = link;
 }
 
-function insertInlineImage(text, href,cname) {
-    if(Markdown.classProcessors[cname]) {
-        Markdown.classProcessors[cname](append, text, href);
-        return;
-    }
-    append("<img src='"+href+"' alt='"+text+"'");
-    if(cname) {
-        append(" class='"+cname+"'");
-    }
-    append("/>");
-}
 
 function escapeRegExp(string) {
     return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -142,30 +31,6 @@ function replaceAll(string, find, replace) {
   return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
 }
 
-function insertCodeBlock(text, id,params) {
-    closeAll();
-    if(id) {
-        Markdown.codeblocks[id] = text;
-    } else {
-        append("<pre><code>");
-        append(replaceAll(text,'<','&lt;'));
-        append("</code></pre>");
-    }
-}
-
-function insertCustomBlock(params) {
-    //console.log("custom block = ",params);
-    console.log("type = ", params.type);
-    if(Markdown.customProcessors[params.type]) {
-        Markdown.customProcessors[params.type](append, params);
-        return;
-    }
-}
-
-function listItem(text) {
-    if(!inside['ul']) openBlock('ul');
-    append("<li>"+text+"</li>\n");
-}
 
 
 export ometa Markdown {
@@ -183,37 +48,188 @@ export ometa Markdown {
     keyvaluepairs = (keyvaluepair)+:kvps,
 
     //block styles
-    elem      = '\n' '*' ws uptoEOL:text -> listItem(text),
-    elem      = '\n' "{" JSONish.start:out "}" -> insertCustomBlock(out),
-    elem      = "```" ws (word)?:id toEOL:params (~"```" anything)+:text "```" -> insertCodeBlock(text.join(''),id,params),
-    elem      = ~'\n' '#' '#' '#' ws uptoEOL:text -> header(1,text),
-    elem      = ~'\n' '#' '#' ws uptoEOL:text -> header(2,text),
-    elem      = ~'\n' '#' ws uptoEOL:text -> header(3,text),
+    elem      = '\n' '*' ws uptoEOL:text -> this.listItem(text),
+    elem      = '\n' "{" JSONish.start:out "}" -> this.insertCustomBlock(out),
+    elem      = "```" ws (word)?:id toEOL:params (~"```" anything)+:text "```" -> this.insertCodeBlock(text.join(''),id,params),
+    elem      = ~'\n' '#' '#' '#' ws uptoEOL:text -> this.header(1,text),
+    elem      = ~'\n' '#' '#' ws uptoEOL:text -> this.header(2,text),
+    elem      = ~'\n' '#' ws uptoEOL:text -> this.header(3,text),
     elem      = ~'\n' '[' word:id ']' ':' toEOL:link -> fillReferenceLink(id, link),
     //inline styles
-    elem      = '*' -> toggle('b'),
-    elem      = '_' -> toggle('i'),
-    elem      = '`' -> toggle('code'),
-    elem      = '!' pairB:title pairP:link classname?:cname -> insertInlineImage(title,link,cname),
-    elem      = pairB:title pairP:link -> insertInlineLink(title,link),
-    elem      = pairB:title pairB:link -> insertReferenceLink(title,link),
-    elem      = EOL &EOL -> openBlock('p'),
+    elem      = '*' -> this.toggle('b'),
+    elem      = '_' -> this.toggle('i'),
+    elem      = '`' -> this.toggle('code'),
+    elem      = '!' pairB:title pairP:link classname?:cname -> this.insertInlineImage(title,link,cname),
+    elem      = pairB:title pairP:link -> this.insertInlineLink(title,link),
+    elem      = pairB:title pairB:link -> this.insertReferenceLink(title,link),
+    elem      = EOL &EOL -> this.openBlock('p'),
 
     //plain text
-    elem      = anything:x -> append(x),
-    start     =  elem+ anything*:y -> endBody(y)
+    elem      = anything:x -> this.append(x),
+    start     =  elem+ anything*:y -> this.endBody(y)
 }
 
 Markdown.reset = function() {
-    buffer = "";
+    this.buffer = "";
     inside = {};
     linkmap = {};
     sections = {};
 }
 
+Markdown.append = function(text) {
+    this.buffer += text;
+}
+
+Markdown.open = function(tag) {
+    if(tag == 'codeblock') {
+        this.append('<pre><code>');
+        return;
+    }
+    this.append('<'+tag+'>');
+}
+
+Markdown.close = function(tag) {
+    if(tag == 'codeblock') {
+        this.append('</code></pre>');
+        return;
+    }
+    this.append('</'+tag+'>');
+}
+
+Markdown.closeBlock = function(n) {
+    this.close(n);
+    this.append('\n');
+    inside[n] = false;
+}
+
+
+
+Markdown.closeAll = function() {
+    for(var elem in block_tags) {
+        if(inside[elem]) {
+            this.append('\n');
+            this.close(elem);
+            inside[elem] = false;
+            this.append('\n');
+        }
+    };
+    for(var elem in inline_tags) {
+        if(inside[elem]) {
+            this.close(elem);
+            inside[elem] = false;
+        }
+    };
+}
+
+Markdown.openBlock = function(n) {
+    this.closeAll();
+    inside[n] = true;
+    this.append('\n');
+    this.open(n);
+}
+
+Markdown.toggle = function(n) {
+    if(!inside[n]) {
+        inside[n] = false;
+    }
+
+    if(inside[n]) {
+        inside[n] = false;
+        this.close(n);
+    } else {
+        inside[n] = true;
+        this.open(n);
+    }
+}
+
+Markdown.toggleBlock = function(n) {
+    if(!inside[n]) {
+        inside[n] = false;
+    }
+    if(inside[n]) {
+        inside[n] = false;
+        this.close(n);
+    } else {
+        inside[n] = true;
+        this.open(n);
+    }
+}
+
+
+Markdown.endBody = function(y) {
+    this.closeAll();
+    return {
+        content: this.buffer.toString(),
+        sections: sections,
+        linkmap: linkmap
+    }
+}
+
+Markdown.insertInlineLink = function(text, href) {
+    this.append("<a href='"+href+"'>");
+    this.append(text);
+    this.close('a');
+}
+Markdown.insertReferenceLink = function(text, ref) {
+    this.append("<a href='#' id='"+ref+"'>");
+    this.append(text);
+    this.close('a');
+}
+
+Markdown.insertCodeBlock = function(text, id,params) {
+    this.closeAll();
+    if(id) {
+        this.codeblocks[id] = text;
+    } else {
+        this.append("<pre><code>");
+        this.append(replaceAll(text,'<','&lt;'));
+        this.append("</code></pre>");
+    }
+}
+
+Markdown.insertCustomBlock = function (params) {
+    console.log("type = ", params.type);
+    if(Markdown.customProcessors[params.type]) {
+        var self = this;
+        Markdown.customProcessors[params.type](function(text) {self.append(text) }, params);
+        return;
+    }
+}
+
+Markdown.insertInlineImage = function(text, href,cname) {
+    if(Markdown.classProcessors[cname]) {
+        var self = this;
+        Markdown.classProcessors[cname](function(text) {self.append(text) }, text, href);
+        return;
+    }
+    this.append("<img src='"+href+"' alt='"+text+"'");
+    if(cname) {
+        this.append(" class='"+cname+"'");
+    }
+    this.append("/>");
+}
+
 Markdown.classProcessors = {};
 Markdown.customProcessors = {};
 Markdown.codeblocks = {};
+
+
+Markdown.listItem = function(text) {
+    if(!inside['ul']) this.openBlock('ul');
+    this.append("<li>"+text+"</li>\n");
+}
+
+Markdown.header = function(level, text) {
+    var id = 'id'+Math.floor(Math.random()*100000);
+    sections[id] = {
+        level: level,
+        text: text
+    };
+    this.openBlock('h'+level);
+    this.append(text);
+    this.closeBlock('h'+level);
+}
+
 
 function smoosh(arr) {
     var obj = {};
@@ -240,7 +256,3 @@ export ometa JSONish {
     keypair   =  ws key:k ":" ws value:v ','? -> [k,v],
     start     =  "{" keypair+:kps ws "}" -> smoosh(kps)
 }
-
-
-
-//foo
