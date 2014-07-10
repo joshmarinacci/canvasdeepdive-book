@@ -1,3 +1,18 @@
+var files = [
+    '01a_overview.md',
+    '02a_handson_charts.md',
+    '03a_advanced_drawing.md',
+    '04a_animation.md',
+    //'05a_gaming1.md',
+    '05b_gaming2.md',
+    '12a_intro_audio.md',
+    '12b_deep_audio.md',
+    '13a_gameinput.md',
+    ];
+
+
+// ================
+
 var ometajs = require('ometa-js');
 var fs = require('fs');
 var Mustache = require('mustache');
@@ -67,13 +82,6 @@ MD.customProcessors['jangle'] = function(append, params) {
 }
 
 
-var files = [
-    '01a_overview.md',
-    '02a_handson_charts.md',
-    '03a_advanced_drawing.md',
-    '04a_animation.md',
-    '12a_intro_audio.md',
-    ];
 var count = 1;
 if(!fs.existsSync('build')) fs.mkdirSync('build');
 
