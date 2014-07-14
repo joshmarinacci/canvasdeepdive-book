@@ -234,7 +234,7 @@ Alternately, you could use an even width line, such as 2 or 4.
 
 ![image coordinates](images/coords.png).screenshot
 
-### Images
+## Images
 
 Canvas can draw images with the `drawImage` function. There are several forms of
 `drawImage`. You can draw the image directly to the screen at normal

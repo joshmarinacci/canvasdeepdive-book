@@ -1,6 +1,6 @@
 <div class='panel panel-success interactive jangle' id='{{id}}' >
     <div class='panel-heading'>
-        <b style='font-size:90%'>INTERACTIVE</b> Drag red numbers left and right to change them
+        <b>INTERACTIVE</b> Drag red numbers left and right to change them
     </div>
     <div class='panel-body'>
         <div class='row'>

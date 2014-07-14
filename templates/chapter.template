@@ -19,29 +19,9 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-
+    <link href='http://fonts.googleapis.com/css?family=Lato|Source+Code+Pro|Exo|Inconsolata' rel='stylesheet' type='text/css'>
+    <link rel='stylesheet' href='../templates/main.css'/>
     <style type='text/css'>
-         body {
-             padding-bottom: 100px;
-         }
-         .interactive img {
-             max-width: 100%;
-         }
-
-         .jangle code i {
-             border: 1px solid #c00;
-             border-radius: 1em;
-             padding: 1px 6px;
-             color: white;
-             background-color: red;
-             font-style: normal;
-             font-weight: bold;
-         }
-         .jangle canvas {
-             border: 1px solid #ccc;
-             border-radius: 4px;
-             max-width: 100%;
-         }
     </style>
   </head>
 
