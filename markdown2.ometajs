@@ -80,12 +80,16 @@ Markdown.append = function(text) {
     this.buffer += text;
 }
 
-Markdown.open = function(tag) {
+Markdown.open = function(tag, atts) {
     if(tag == 'codeblock') {
         this.append('<pre><code>');
         return;
     }
-    this.append('<'+tag+'>');
+    this.append('<'+tag);
+    for(var key in atts) {
+        this.append(' '+key+'="'+atts[key]+'"');
+    }
+    this.append('>');
 }
 
 Markdown.close = function(tag) {
@@ -121,11 +125,11 @@ Markdown.closeAll = function() {
     };
 }
 
-Markdown.openBlock = function(n) {
+Markdown.openBlock = function(n, atts) {
     this.closeAll();
     inside[n] = true;
     this.append('\n');
-    this.open(n);
+    this.open(n,atts);
 }
 
 Markdown.toggle = function(n) {
@@ -225,10 +229,8 @@ Markdown.header = function(level, text) {
         level: level,
         text: text
     };
-    this.openBlock('h'+level);
-    this.append('<a id="'+id+'">');
+    this.openBlock('h'+level, {id:id});
     this.append(text);
-    this.append('</a>');
     this.closeBlock('h'+level);
 }
 
