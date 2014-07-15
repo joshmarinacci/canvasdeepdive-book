@@ -18,10 +18,10 @@ MD.append = function(text) {
 var oldheader = MD.header;
 MD.header = function(level, text) {
     if(level == 1) {
-    currentPage = { buf:''};
-    pages.push(currentPage);
-    currentPage.content = [];
-    currentPage.content.push(text);
+        currentPage = { buf:''};
+        pages.push(currentPage);
+        currentPage.content = [];
+        currentPage.content.push(text);
     }
     oldheader.call(MD,level,text);
 }
@@ -29,7 +29,8 @@ MD.header = function(level, text) {
 
 if(!fs.existsSync('build')) fs.mkdirSync('build');
 var input = fs.readFileSync('presentations/ble.md').toString();
-var out = MD.matchAll(input.toString(),'start');
+MD.reset();
+var out = MD.matchAll(input,'start');
 console.log("output = ",out);
 console.log("pages = ",pages);
 console.log("=======");
