@@ -45,12 +45,13 @@ window.requestAnimFrame = (function(){
           function( callback ){
             window.setTimeout(callback, 1000 / 60);
           };
-})();</code></pre>
+})();
 ```
 
 Lets try a simple example where we animate a rectangle across the screen.
 
-```var x = 0;
+```
+var x = 0;
 function drawIt() {
     window.requestAnimFrame(drawIt);
     var canvas = document.getElementById('canvas');

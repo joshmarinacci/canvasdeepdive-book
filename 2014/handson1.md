@@ -1,10 +1,10 @@
 ### Hands On: Making Charts
 
-Note that in this chapter we will load code directly from the local hard drive
-rather than through a webserver. You may need to disable security in Chrome
-during development because of this. If you are having issues with Chrome loading
-images or other files directly from disk, try adding some security flags to the
-command line.
+Note that you will load code directly from the local hard drive rather than
+through a webserver. You may need to disable security in Chrome during
+development because of this. If you are having issues with Chrome loading images
+or other files directly from disk, try adding security flags to the command
+line.
 
 On Mac OS X this would be:
 

@@ -5,6 +5,7 @@ var block_tags = {
     'h1':'h1',
     'h2':'h2',
     'h3':'h3',
+    'aside':'aside',
     'codeblock':'codeblock'
 }
 
@@ -51,10 +52,12 @@ export ometa Markdown {
     elem      = '\n' '*' ws uptoEOL:text -> this.listItem(text),
     elem      = '\n' "{" JSONish.start:out "}" -> this.insertCustomBlock(out),
     elem      = "```" ws (word)?:id toEOL:params (~"```" anything)+:text "```" -> this.insertCodeBlock(text.join(''),id,params),
-    elem      = ~'\n' '#' '#' '#' ws uptoEOL:text -> this.header(1,text),
-    elem      = ~'\n' '#' '#' ws uptoEOL:text -> this.header(2,text),
-    elem      = ~'\n' '#' ws uptoEOL:text -> this.header(3,text),
-    elem      = ~'\n' '[' word:id ']' ':' toEOL:link -> fillReferenceLink(id, link),
+    elem      = '\n' '#' '#' '#' ws uptoEOL:text -> this.header(1,text),
+    elem      = '\n' '#' '#' ws uptoEOL:text -> this.header(2,text),
+    elem      = '\n' '#' ws uptoEOL:text -> this.header(3,text),
+    elem      = '\n' '[' word:id ']' ':' toEOL:link -> fillReferenceLink(id, link),
+    elem      = '\n' "---" -> this.horizontalRule(),
+
     //inline styles
     elem      = '*' -> this.toggle('b'),
     elem      = '_' -> this.toggle('i'),
@@ -62,6 +65,7 @@ export ometa Markdown {
     elem      = '!' pairB:title pairP:link classname?:cname -> this.insertInlineImage(title,link,cname),
     elem      = pairB:title pairP:link -> this.insertInlineLink(title,link),
     elem      = pairB:title pairB:link -> this.insertReferenceLink(title,link),
+    elem      = EOL "@note" -> this.openNoteParagraph(),
     elem      = EOL &EOL -> this.openBlock('p'),
 
     //plain text
@@ -69,6 +73,9 @@ export ometa Markdown {
     start     =  elem+ anything*:y -> this.endBody(y)
 }
 
+Markdown.openNoteParagraph = function() {
+    this.openBlock('aside',{class:'notes'});
+}
 Markdown.reset = function() {
     this.buffer = "";
     inside = {};
@@ -234,6 +241,12 @@ Markdown.header = function(level, text) {
     this.closeBlock('h'+level);
 }
 
+Markdown.horizontalRule = function() {
+    this.append("<hr/>");
+
+    this.closeAll();
+    this.append('\n');
+}
 
 function smoosh(arr) {
     var obj = {};

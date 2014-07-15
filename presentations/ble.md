@@ -1,18 +1,25 @@
+
 ### Bluetooth Low Energy
 ##  Big Progress for Small Consumption
 
 Josh Marinacci
+
 Advanced Technologies, Nokia
 
 ---
 
 ### 60 second summary of wireless technology
 
-Here we go. in 60 seconds everything you ever needed to know
+@note Here we go. in 60 seconds everything you ever needed to know
 about wireless technology for mobile devices
 
+
 ---
+
 ### In The Beginning
+
+
+---
 
 ## Infra Red
 
@@ -24,7 +31,18 @@ sight. But you could transfer phone contacts, so that was cool.
 
 http://en.wikipedia.org/wiki/Infrared#Communications
 
+
 ---
+
+### Bluetooth 1994
+
+
+
+* Bluetooth 1.0 (1994) 0.7 Mb
+* Bluetooth 2.0 (2004) 3.0 Mb
+* Bluetooth 3.0 (2009) 24 Mb (by cheating w/ WiFi)
+
+http://en.wikipedia.org/wiki/Bluetooth
 
 @note Next up came Bluetooth (1994), which didn't require line of sight and was
 faster, but cost a lot more and killed your battery life. And the specs were
@@ -33,50 +51,43 @@ car and make voice calls. It could also do other cool things like transfer files
 assuming your carrier wasn't Verizon who blocked it. It's been updated over the
 years with more features and speeds, but essentially the same.
 
-### Bluetooth 1994
-
-* Bluetooth 1.0 (1994) 0.7 Mb
-* Bluetooth 2.0 (2004) 3.0 Mb
-* Bluetooth 3.0 (2009) 24 Mb (by cheating w/ WiFi)
-
-http://en.wikipedia.org/wiki/Bluetooth
-
 
 ---
 
 ### RFID
 ## one way barcode
 
-@note Next came no-contact wireless communication, powered or unpowered. a few meters
-to 100s of meters if powered. low data rate. essentially wireless barcodes. they
-are getting smaller and cheaper.
 
 http://news.bbc.co.uk/2/hi/uk_news/england/bristol/somerset/8011998.stm
 
 http://en.wikipedia.org/wiki/RFID
+
+@note Next came no-contact wireless communication, powered or unpowered. a few meters
+to 100s of meters if powered. low data rate. essentially wireless barcodes. they
+are getting smaller and cheaper.
 
 ---
 
 ###  NFC: Near Field Communication
 ## 2004: two way barcodes
 
+http://en.wikipedia.org/wiki/Near_field_communication
+
 @note NFC is fancier with two way communication, Mainly used in commerce applications.
 Notably, Apple devices do not support it, but Google has really pushed it.
-
-http://en.wikipedia.org/wiki/Near_field_communication
 
 
 ---
 
 ### Why They Suck
 
-So what is wrong with these? Why did we need something better.  For a lot of use
+
+@note What is wrong with these? Why did we need something better.  For a lot of use
 cases you don't need high speed, but you do need very low power consumption
 while still being two way, but without requiring line of sight. And we want
 something that works on every mobile OS, and that doesn't require being a part
-of some special developer program.
+of some special developer program. That's what Bluetooth Low Energy gives us.
 
-That's what Bluetooth Low Energy gives us.
 
 ---
 
@@ -96,7 +107,9 @@ awesome.
 
 ### Bluetooth Low Energy
 
-As the name would suggest, Bluetooth Low Energy is designed around using
+http://en.wikipedia.org/wiki/Bluetooth_low_energy
+
+@note As the name would suggest, Bluetooth Low Energy is designed around using
 very little power.  It can be used all the time on your phone without killing
 your battery. It can be used with embedded sensors that last up to a year on
 a single battery. To accomplish this the BT guys had to design a very different
@@ -105,13 +118,13 @@ streams of data. Rather it has a bunch of key value pairs called Characteristics
 These are grouped into sets called profiles. It is these profiles that let
 you communicate between devices.
 
-http://en.wikipedia.org/wiki/Bluetooth_low_energy
+
 
 ---
 
 ### Last Year
 
-The underlying chips for BLE are fairly cheap, but not easy to work with. You
+@note The underlying chips for BLE are fairly cheap, but not easy to work with. You
 have to be a real embedded systems programmer to program them. You also needed a
 very expensive compiler. A year ago there was only one or two Arduino compatible
 boards for BLE. They were limited in features and very expensive.   You also
@@ -120,6 +133,7 @@ time only a few of the iPhones had support and iOS 6 was buggy. Only a few
 Android phones supported it and they used vendor specific APIs.  Windows Phone
 didn't support it at all even though most of Nokia's Lumia devices had the
 hardware to support it.
+
 
 ---
 
@@ -131,6 +145,7 @@ OSes support it.  iOS 7 has very good support, all Apple devices have it built i
 even their desktops. With JellyBean Android supports it. With Windows Phone 8.1
 those Lumia devices support it. There is also pretty good support on desktop
 oses. You can even run it on a Raspberry Pi with a cheap dongle from Amazon.
+
 
 ---
 
@@ -153,17 +168,21 @@ break them into three categories.
 * BLE built in: Arduino compatible
 * USB adapters: desktop & Raspberry Pi
 
+
 ---
 
 ### List of Shields
+
 
 ---
 
 ### List of BLE built ins
 
+
 ---
 
 ### List of USB dongles
+
 
 ---
 
@@ -280,7 +299,7 @@ They are mostly not-AVR based, so some standard Arduino libraries may not work w
 
 ---
 
-@And another option is to buy a board where the maker has done the hard work of creating
+@note And another option is to buy a board where the maker has done the hard work of creating
 a custom profile for you. Red Bear Labs and Dr. Kroll have provided alternative
 firmware for ANCS and iBeacon support.
 ---

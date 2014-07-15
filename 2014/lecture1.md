@@ -288,9 +288,9 @@ which looks like this:
 
 ![mammal chart v5](../2014/lecture1_05.png).screenshot
 
-So that is the basics of canvas. You get a context, set the fill color, then draw your shapes. Simple
-and fast.  Now let's switch to the hands on. In this hands on you'll use canvas to build
-a bar chart and pie chart from scratch.
+So that is the basics of canvas. You get a context, set the fill color, then
+draw your shapes. Simple and fast.  Now let's switch to the hands on. In this
+hands on you'll use canvas to build a bar chart and pie chart from scratch.
 
-You will need a text editor and a webbrowser. I suggest using Chrome because it has great
-dev tools and works the same on all platforms.
+You will need a text editor and a webbrowser. I suggest using Chrome because it
+has great dev tools and works the same on all platforms.

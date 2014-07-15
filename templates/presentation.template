@@ -42,66 +42,11 @@
 
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
-				<section>
-					<h1>Bluetooth Low Energy</h1>
-					<h2>Big Progress for Small Consumption</h1>
-					<p>
-						Josh Marinacci <br/>
-						Advanced Technologies, Nokia
-					</p>
-				</section>
-
-				<section>
-					<h2>The History of Wireless<br/> Technology in 60 seconds</h2>
-				</section>
-
-				<section>
-					<h2>Marvelous Unordered List</h2>
-					<ul>
-						<li>No order here</li>
-						<li>Or here</li>
-						<li>Or here</li>
-						<li>Or here</li>
-					</ul>
-				</section>
-
-				<section>
-					<h2>Fantastic Ordered List</h2>
-					<ol>
-						<li>One is smaller than...</li>
-						<li>Two is smaller than...</li>
-						<li>Three!</li>
-					</ol>
-				</section>
-
-
-				<section>
-					<h2>Pretty Code</h2>
-					<pre><code data-trim contenteditable>
-function linkify( selector ) {
-  if( supports3DTransforms ) {
-
-    var nodes = document.querySelectorAll( selector );
-
-    for( var i = 0, len = nodes.length; i &lt; len; i++ ) {
-      var node = nodes[i];
-
-      if( !node.className ) {
-        node.className += ' roll';
-      }
-    }
-  }
-}
-					</code></pre>
-					<p>Courtesy of <a href="http://softwaremaniacs.org/soft/highlight/en/description/">highlight.js</a>.</p>
-				</section>
-
-				<section>
-					<h2>Spectacular image!</h2>
-						<img width="320" height="299" src="http://s3.amazonaws.com/hakim-static/portfolio/images/meny.png" alt="Meny">
-				</section>
-
-
+				{{#.}}
+					<section>
+						{{{buf}}}
+					</section>
+				{{/.}}
 			</div>
 
 		</div>

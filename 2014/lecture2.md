@@ -1,16 +1,17 @@
+
 ### Charts with SVG and D3
 
 ## What is SVG?
 
 Building a chart with Canvas was pretty easy. We did a bit of math and drew some
 shapes. But we didn't have animation. We didn’t have interaction. We didn't
-handle UI. And there were lots of hard coded values. What would happen if we get
-more data values, or if the values exceed the range we planned for? We could fix
-all of these things by hand with more code, or we could use technologies that
-handle these things for us: SVG and D3
+handle UI events. And there were lots of hard coded values. What would happen if
+we get more data values, or if the values exceed the range we planned for? We
+could fix all of these things by hand with more code, or we could use
+technologies that handle these things for us: SVG and D3
 
 
-Just like canvas, SVG is a box in the web page. The difference is that we can
+Just like Canvas, SVG is a box in the web page. The difference is that we can
 put shapes directly inline. Here's an SVG box with a rectangle and circle
 inside.
 
@@ -53,26 +54,28 @@ properties.
 </html>
 ```
 
-![SVG styled with CSS](../2014/lecture2_01.png).screenshot
+![SVG styled with CSS](../2014/lecture2_02.png).screenshot
 
 
 ## D3: Data Driven Documents
 
 To draw a chart we could add a bunch of shapes, one for each data point, but
 this wouldn't really be an advantage over Canvas. We are still doing a lot of
-work  by hand.  Let's look at a library made specifically for doing data
-visualization: [D3](http://d3js.org).
+work by hand.  Instead, we can use an open source library made specifically for
+doing data visualization: [D3](http://d3js.org).
 
-* background on D3
-* some examples of D3
-* a lot of this material came from this book [link]
-* and tutorials [link]. highly recommended.
+D3 was created by {name} and {name}
 
 
-## Charts with D3
+here are a few examples of what D3 can do. It's very powerful.
 
-Let's use D3 to make the same bar chart as you made in the hands on lab. We
-will start by creating the SVG element using the D3 API in Javascript.
+
+
+
+## Simple Chart with D3
+
+Let's use D3 to make the same bar chart as you made in the hands on lab. We will
+start by creating the SVG element using the D3 API in Javascript.
 
 ```
 var w = 500;   // save our width and height for later
@@ -86,6 +89,7 @@ var svg = d3.select('body')
 
 This is the same as writing the SVG element in the page, but by using D3 we can start
 adding behavior. Now let's add a rectangle for each data point.
+
 
 ```
 svg.selectAll('rect')
@@ -108,6 +112,8 @@ svg.selectAll('rect')
     ;
 ```
 
+![basic svg chart](../2014/lecture2_03.png).screenshot
+
 This is similar to what we did with Canvas, but notice there is no loop. The
 library is handling this for us.  Let's go through it step by step.
 
@@ -127,6 +133,8 @@ index of the element times 30. Each of the other values are similar to what we
 did for Canvas, but using these little callback functions instead of the loop
 code.
 
+## Scaling Data
+
 What do we do if we get so much data that it won't fit, or if one of the values
 is so big it goes off the top of the chart?  As with Canvas, we could calculate
 correct values by hand, but D3 already has a way to do this for us. It's called a
@@ -140,35 +148,201 @@ output is called the _range_.  Let's create a new linear scale and set the domai
 and range.
 
 ```
-var scale = d3.scale.linear()
+var yscale = d3.scale.linear()
                     .domain([0, 1000])
                     .range([0, 100]);
 ```
 
-Now we can call `scale()` as a function to have it convert numbers for us.
+Now we can call `yscale()` as a function to have it convert numbers for us. We need
+to update the y and height setters to use `yscale()` too.
+
+```
+svg.selectAll('rect')
+...
+    .attr('y',function(d,i) {
+        return h-yscale(d);
+    })
+    .attr('height', function(d,i) {
+        return yscale(d);
+    })
+    ;
+```
+
+
+Now any value between 0 and 1000 will work. But what happens if we get a value bigger than
+1000?  We've just moved the problem. The real solution is to set the domain to
+the maximum value in our actual dataset. Then the chart will always adapt properly.
+
+```
+var yscale = d3.scale.linear()
+        .domain([0, d3.max(dataset, function(d) { return d; })])
+        .range([0, 100]);
+```
+
+Here's what it looks like with proper y scaling.
+
+![properly scaled chart](../2014/lecture2_04.png).screenshot
+
+
+
 
 There are other kinds of scales besides linear. Log is very useful when
 tracking exponential trends like Moore's law.
 
 ![example of moores law log graph](asdf.png)
 
-* update the data and see that it adapts automatically
 
-* add the two axes, notice how it makes them pretty with the ticks and values.
+## Updating Data
 
-
-the real magic of d3 is how it handles updates. everything we've done so
-far has been static. it could have been done a hundred years ago in a newspaper,
-just with more effort.  to take advantage of the web we can make things
+The real magic of D3 is how it handles updates. Everything we've done so
+far has been static. It could have been done a hundred years ago in a newspaper,
+just with more effort.  To take advantage of the web we can make things
 update dynamically with animation.
 
 
+```
+<button id='update'>update</button>
 
-* now we add a button to switch between data sets
-* animate between them
+...
 
-tweak the animation to use different durations and easings
-add a calculated delay to make them start and stop at different times
+d3.select('button').on('click', function() {
+    //update the data
+    dataset = [ 400, 800, 100, 600, 500, 1000];
+    yscale.domain([0, d3.max(dataset, function(d) { return d; })])
 
-add simple event handler to print the value of the bar you clicked on
-add an event handler to change side bar details when you click on the bar
+    //adjust the y values
+    svg.selectAll('rect')
+        .data(dataset)
+        .attr('y',function(d,i) {
+            return h-yscale(d);
+        })
+        .attr('height', function(d,i) {
+            return yscale(d);
+        });
+});
+```
+
+I've added a button at the top of the page and an event handler for it. When the
+button is pressed it changes the dataset to the new values and updates the
+domain of the `yscale`.  The actual rectangles haven't changed yet, however. To
+do that we need to set the data again and update the y and height values. We
+could update the x and width values too, but since those aren't changing it
+wouldn't make any difference.  
+
+Here's what it looks like.
+
+[without animation](../../d3tutorial/demo2.html)
+
+
+Hmm. That doesn't look too good. The data changes but the bars just suddenly
+switch to their new values. There's no sense of how they are changing. We want
+to animate the bars to their new heights. D3 can do that for us very easily
+with transitions. By adding this code we can create a transition of 500
+milliseconds.  The delay function adds a delay to the transition of each
+rectangle. This calculates a different delay for each one so the bars
+come in one after another over a second, creating a fun animated effect.
+
+```
+        .transition().duration(500)
+        .delay(function(d,i) {
+            return i/dataset.length * 1000; //using msec
+        })
+```
+
+[with animation](../../d3tutorial/demo3.html)
+
+
+There's one more thing we need: a Y axis. We can see which bar is biggest but we
+don't know how much each bar represents. We need an axis with ticks along the
+left edge.  D3 provides an axis class to do this.
+
+
+```
+var yaxis = d3.svg.axis()
+          .scale(yscale)
+          .orient('right')
+          .ticks(5)
+          ;
+
+svg.append('g')
+      .attr('class','y axis') //add the axis class
+      .call(yaxis);
+```
+
+
+{{
+    type: "interactive"
+    href: "../../d3tutorial/demo4.html"
+    image: "../2014/lecture2_05.png"
+    text: "Animated bar chart"
+}}
+
+
+Hmm. That's not quite right. The axis is squished near the top
+and the bottom. Also, the numbers are going in the wrong direction.
+We can fix both problems easily.First modify the yscale.range from `[0,100]` to `[h-10,10]`.
+This changes the direction and adds a ten pixel gap on each end.
+
+```
+var yscale = d3.scale.linear()
+        .domain([0, d3.max(dataset, function(d) { return d; })])
+//        .range([0, 100])
+        .range([h-10, 10])
+        ;
+```
+
+Then we have to swap the direction of the y and height attribute setters
+```
+        .attr('y',function(d,i) {
+            //return h-yscale(d);
+            return yscale(d);
+        })
+        .attr('height', function(d,i) {
+            //return yscale(d);
+            return h-yscale(d);
+        });
+```
+
+And also update the y-axis when the button is pressed
+
+```
+svg.select('.y.axis')
+    .transition()
+    .duration(1000)
+    .call(yaxis);
+```
+
+Okay. Now everything is going in the right direction and we have some space
+at the bottom. One more thing. Let's restyle the axis to make it look a bit better.
+Since this styling won't change we can do it with plain CSS.
+
+```
+<style>
+.axis path, .axis line{
+     fill: none;
+     stroke: black;
+     shape-rendering: crispEdges;
+}
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+</style>
+```
+
+
+There we go. Much better.
+
+{{
+    type: "interactive"
+    href: "../../d3tutorial/demo5.html"
+    image: "../2014/lecture2_06.png"
+    text: "Styled and Animated Bar Chart"
+}}
+
+
+
+D3 is a very powerful SVG framework. It can do animation, handle user events, style
+SVG shapes, and properly scale values to make your charts look great.  D3 can also
+create interactive geographical maps. In the hands on you will create a map of the US
+showing agricultural data with shades of green.
