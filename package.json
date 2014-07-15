@@ -22,6 +22,7 @@
   "dependencies": {
     "bootstrap": "^3.2.0",
     "mustache": "^0.8.2",
-    "ometa-js": "^1.3.2"
+    "ometa-js": "^1.3.2",
+    "wrench": "^1.5.8"
   }
 }

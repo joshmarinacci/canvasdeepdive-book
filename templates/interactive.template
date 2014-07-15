@@ -1,0 +1,10 @@
+<div class='panel panel-success interactive'>
+    <div class='panel-heading'>
+        <b style='font-size:90%'>INTERACTIVE</b> Click to view
+    </div>
+    <div class='panel-body'>
+        <a href='{{href}}'>
+            <img src='{{url}}'/>
+        </a>
+    </div>
+</div>

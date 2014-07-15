@@ -1,3 +1,4 @@
+
 ### Hands On: Making Charts
 
 Note that you will load code directly from the local hard drive rather than
@@ -89,7 +90,7 @@ for(var i=0; i<data.length; i++) {
 
 Now load this page up in your webbrowser. It should look like this:
 
-![plain data bars](images/barchart1.png).screenshot
+![plain data bars](barchart1.png).screenshot
 
 
 The first problem is that the bars are coming down from the top instead  of the
@@ -109,7 +110,7 @@ for(var i=0; i<data.length; i++) {
 
 Now it looks like this:
 
-![fixed orientation](images/barchart2.png).screenshot
+![fixed orientation](barchart2.png).screenshot
 
 
 
@@ -156,7 +157,7 @@ for(var i=0; i<5; i++) {
 
 The result looks like this:
 
-![chart with axis lines and lables](images/barchart2_5.png).screenshot
+![chart with axis lines and lables](barchart2_5.png).screenshot
 
 
 Not bad, but there are a few tweaks we should make.  Let's change the
@@ -180,7 +181,7 @@ for(var i=0; i<data.length; i++) {
 Now the final chart looks like this:
 
 
-![prettier barchart](images/barchart3.png).screenshot
+![prettier barchart](barchart3.png).screenshot
 
 
 ## Piechart
@@ -275,7 +276,7 @@ c.fillText(text, 250-metrics.width/2, 400);
 
 This is what it will look like:
 
-![finished pie chart](images/piechart1.png).screenshot
+![finished pie chart](piechart1.png).screenshot
 
 
 ## Add Some Gradients
@@ -297,7 +298,7 @@ radial gradient like this:
 The gradient fills the slice going from white at the center to the color at the
 edge, adding a bit more depth to the chart. It should look like this:
 
-![piechart with gradients](images/piechart2.png).screenshot
+![piechart with gradients](piechart2.png).screenshot
 
 
 To make this chart more useful here are a few more improvements you could try making:

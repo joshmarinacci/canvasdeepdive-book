@@ -1,11 +1,12 @@
+
 ### D3: Hands On
 
 In this Hands On you will build an interactive map of the US using D3. I have
 adapted this tutorial from the
 [Interactive Data Visualization for the Web](http://alignedleft.com/work/d3-book)
-by Scott Murray, which is the best
-book on D3 I have found. It goes into far more depth than we could possibly have
-time for here. I highly recommend reading it.
+by Scott Murray, which is the best book on D3 I have found. It goes into far
+more depth than we could possibly have time for here. I highly recommend reading
+it.
 
 
 ## HTML Setup
@@ -92,7 +93,7 @@ d3.json('us-states.json', function(json) {
 Reload your page and you should see a map of the US. The states are all
 black because we haven't assigned any colors yet.
 
-![Plain US map](../2014/handson2_01.png).screenshot
+![Plain US map](handson2_01.png).screenshot
 
 ## Map Projections
 
@@ -128,7 +129,7 @@ The projection translates the map to be centered in the SVG box. It also scales
 the map down slightly so it will fit. Be sure to apply the projection to the
 path object so that D3 will use it when drawing the map.
 
-![Fixed Projection and Scaling](../2014/handson2_02.png).screenshot
+![Fixed Projection and Scaling](handson2_02.png).screenshot
 
 
 ## Loading Data
@@ -261,7 +262,7 @@ svg.selectAll('path')
 
 Now reload your page and it should look like this:
 
-![Map of US States with color](../2014/handson2_03.png).screenshot
+![Map of US States with color](handson2_03.png).screenshot
 
 
 
@@ -321,7 +322,7 @@ svg.selectAll('path')
 
 And now it looks like this:
 
-![Map with hover and click events](../2014/handson2_04.png)
+![Map with hover and click events](handson2_04.png).screenshot
 
 
 As an exercise to the reader, we can give each state a nice black border

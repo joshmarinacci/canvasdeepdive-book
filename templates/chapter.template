@@ -7,7 +7,7 @@
     <title>{{title}}</title>
 
     <!-- Bootstrap -->
-    <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -20,7 +20,7 @@
     <![endif]-->
 
     <link href='http://fonts.googleapis.com/css?family=Lato|Source+Code+Pro|Exo|Inconsolata' rel='stylesheet' type='text/css'>
-    <link rel='stylesheet' href='../templates/main.css'/>
+    <link rel='stylesheet' href='css/main.css'/>
     <style type='text/css'>
     </style>
   </head>
@@ -53,6 +53,6 @@
 
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
   </body>
 </html>

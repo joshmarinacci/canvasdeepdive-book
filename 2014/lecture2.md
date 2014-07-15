@@ -27,7 +27,7 @@ inside.
 </html>
 ```
 
-![Simple SVG](../2014/lecture2_01.png).screenshot
+![Simple SVG](lecture2_01.png).screenshot
 
 Now let's style the shapes. We can set attributes directly on the shapes or use
 CSS. The CSS works just like regular CSS for the DOM but we use different
@@ -54,7 +54,7 @@ properties.
 </html>
 ```
 
-![SVG styled with CSS](../2014/lecture2_02.png).screenshot
+![SVG styled with CSS](lecture2_02.png).screenshot
 
 
 ## D3: Data Driven Documents
@@ -112,7 +112,7 @@ svg.selectAll('rect')
     ;
 ```
 
-![basic svg chart](../2014/lecture2_03.png).screenshot
+![basic svg chart](lecture2_03.png).screenshot
 
 This is similar to what we did with Canvas, but notice there is no loop. The
 library is handling this for us.  Let's go through it step by step.
@@ -181,7 +181,7 @@ var yscale = d3.scale.linear()
 
 Here's what it looks like with proper y scaling.
 
-![properly scaled chart](../2014/lecture2_04.png).screenshot
+![properly scaled chart](lecture2_04.png).screenshot
 
 
 
@@ -273,7 +273,7 @@ svg.append('g')
 {{
     type: "interactive"
     href: "../../d3tutorial/demo4.html"
-    image: "../2014/lecture2_05.png"
+    image: "lecture2_05.png"
     text: "Animated bar chart"
 }}
 
@@ -336,7 +336,7 @@ There we go. Much better.
 {{
     type: "interactive"
     href: "../../d3tutorial/demo5.html"
-    image: "../2014/lecture2_06.png"
+    image: "lecture2_06.png"
     text: "Styled and Animated Bar Chart"
 }}
 
