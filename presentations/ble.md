@@ -23,13 +23,13 @@ about wireless technology for mobile devices
 
 ## Infra Red
 
-!Image of Palm V
+![Palm V](../presentations/PalmV_2.jpg)
 
 @note Infrared was the cheapest and easiest way to transmit data between mobile
 battery powered devices. It was awesome except it was slow and required line of
 sight. But you could transfer phone contacts, so that was cool.
 
-http://en.wikipedia.org/wiki/Infrared#Communications
+@note http://en.wikipedia.org/wiki/Infrared#Communications
 
 
 ---
@@ -42,7 +42,9 @@ http://en.wikipedia.org/wiki/Infrared#Communications
 * Bluetooth 2.0 (2004) 3.0 Mb
 * Bluetooth 3.0 (2009) 24 Mb (by cheating w/ WiFi)
 
-http://en.wikipedia.org/wiki/Bluetooth
+![Bluetooth Log](../presentations/bt.jpg)
+
+@note http://en.wikipedia.org/wiki/Bluetooth
 
 @note Next up came Bluetooth (1994), which didn't require line of sight and was
 faster, but cost a lot more and killed your battery life. And the specs were
@@ -55,12 +57,14 @@ years with more features and speeds, but essentially the same.
 ---
 
 ### RFID
-## one way barcode
 
+![RFID](../presentations/rfid.jpg)
 
-http://news.bbc.co.uk/2/hi/uk_news/england/bristol/somerset/8011998.stm
+## mid 90s: one way barcode
 
-http://en.wikipedia.org/wiki/RFID
+@note http://news.bbc.co.uk/2/hi/uk_news/england/bristol/somerset/8011998.stm
+
+@note http://en.wikipedia.org/wiki/RFID
 
 @note Next came no-contact wireless communication, powered or unpowered. a few meters
 to 100s of meters if powered. low data rate. essentially wireless barcodes. they
@@ -68,10 +72,14 @@ are getting smaller and cheaper.
 
 ---
 
-###  NFC: Near Field Communication
+###  NFC:
+
+![NFC](../presentations/hid_nfc.jpg)
+
 ## 2004: two way barcodes
 
-http://en.wikipedia.org/wiki/Near_field_communication
+
+@note http://en.wikipedia.org/wiki/Near_field_communication
 
 @note NFC is fancier with two way communication, Mainly used in commerce applications.
 Notably, Apple devices do not support it, but Google has really pushed it.
@@ -79,8 +87,21 @@ Notably, Apple devices do not support it, but Google has really pushed it.
 
 ---
 
+### WiFi
+
+![wifi](../presentations/save_earth_wifi.jpg)
+
+@note WiFi is fast, but it's overkill fast. And that means it sucks power. It's
+okay for something like a smartphone, but not good for tiny coincell powered
+devices. Also, you've got the whole login problem.
+
+---
+
 ### Why They Suck
 
+## But they do!
+
+![jesse](pic.png)
 
 @note What is wrong with these? Why did we need something better.  For a lot of use
 cases you don't need high speed, but you do need very low power consumption
@@ -107,7 +128,11 @@ awesome.
 
 ### Bluetooth Low Energy
 
-http://en.wikipedia.org/wiki/Bluetooth_low_energy
+@note http://en.wikipedia.org/wiki/Bluetooth_low_energy
+
+![woman](btle_woman.jpg)
+
+
 
 @note As the name would suggest, Bluetooth Low Energy is designed around using
 very little power.  It can be used all the time on your phone without killing
@@ -124,6 +149,11 @@ you communicate between devices.
 
 ### Last Year
 
+* two boards
+* iPhone only
+* few computers
+* hard to code
+
 @note The underlying chips for BLE are fairly cheap, but not easy to work with. You
 have to be a real embedded systems programmer to program them. You also needed a
 very expensive compiler. A year ago there was only one or two Arduino compatible
@@ -135,11 +165,17 @@ didn't support it at all even though most of Nokia's Lumia devices had the
 hardware to support it.
 
 
+
 ---
 
 ### This Year
 
-Today life in the BLE world is so much better. There are tons of Arduino
+* tons of boards
+* all iDevices, Android 4.3+, WinPhone 8+
+* great libraries
+* most computers, 20$ dongles
+
+@note Today life in the BLE world is so much better. There are tons of Arduino
 compatible breakout boards, the price keeps going down, and all of the Smartphones
 OSes support it.  iOS 7 has very good support, all Apple devices have it built in,
 even their desktops. With JellyBean Android supports it. With Windows Phone 8.1
@@ -150,6 +186,10 @@ oses. You can even run it on a Raspberry Pi with a cheap dongle from Amazon.
 ---
 
 ### Next Year
+
+
+* every device, ever
+
 
 @note Pretty much everywhere. Since it's built into the 4.0 BT spec pretty much every
 smart device is going to get it. And since the chips are cheap, pretty much
@@ -172,6 +212,9 @@ break them into three categories.
 ---
 
 ### List of Shields
+
+* Bluefruit (Adafruit)
+*
 
 
 ---

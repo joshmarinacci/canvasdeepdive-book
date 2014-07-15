@@ -62,20 +62,27 @@ properties.
 To draw a chart we could add a bunch of shapes, one for each data point, but
 this wouldn't really be an advantage over Canvas. We are still doing a lot of
 work by hand.  Instead, we can use an open source library made specifically for
-doing data visualization: [D3](http://d3js.org).
+doing data visualization. It is called [D3](http://d3js.org).
 
-D3 was created by {name} and {name}
+D3 was created in 2011 by Mike Bostock, Jeff Heer, and Vadim Ogievetsky at
+Standford University as a replacement for their earlier framework, Protovis.
 
 
-here are a few examples of what D3 can do. It's very powerful.
+D3 is very powerful while still being accessible. Here are a few examples.
+
+* A [colored map](http://bl.ocks.org/mbostock/4060606) of unemployment rates.
+* A [polar clock](http://bl.ocks.org/mbostock/1096355)
+* A draggable graph of [mobile patent lawsuits](http://bl.ocks.org/mbostock/1153292).
+* A chord diagram of [software class relationships](http://bl.ocks.org/mbostock/1046712).
 
 
 
 
 ## Simple Chart with D3
 
-Let's use D3 to make the same bar chart as you made in the hands on lab. We will
-start by creating the SVG element using the D3 API in Javascript.
+Let's start with something simple. We will use D3 to make the same bar chart as
+you made in the hands on lab. We will start by creating the SVG element using
+the D3 API in Javascript.
 
 ```
 var w = 500;   // save our width and height for later

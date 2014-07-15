@@ -30,6 +30,14 @@
 				document.getElementsByTagName( 'head' )[0].appendChild( link );
 			}
 		</script>
+		<style type='text/css'>
+		section img {
+			border: 1px solid red;
+			padding: 50px;
+			width: auto;
+			height: 400px;
+		}
+		</style>
 
 		<!--[if lt IE 9]>
 		<script src="../../lib/js/html5shiv.js"></script>
@@ -59,18 +67,19 @@
 			// Full list of configuration options available here:
 			// https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
+		   		width: 960,
+    			height: 700,
+			    margin: 0.1,
+
+
 				controls: false,
 				progress: true,
 				history: true,
 				center: true,
+				touch: true,
 
-				theme: 'moon',//Reveal.getQueryHash().theme, // available themes are in /css/theme
-				transition: 'concave',//Reveal.getQueryHash().transition || 'default',
-			        // default/cube/page/concave/zoom/linear/fade/none
-
-				// Parallax scrolling
-				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
-				// parallaxBackgroundSize: '2100px 900px',
+				theme: 'moon',
+				transition: 'concave',
 
 				// Optional libraries used to extend on reveal.js
 				dependencies: [
