@@ -86,6 +86,7 @@ MD.customProcessors['jangle'] = function(append, params) {
 
 var count = 1;
 if(!fs.existsSync('build')) fs.mkdirSync('build');
+if(!fs.existsSync('build_2014')) fs.mkdirSync('build_2014');
 
 
 function findTitle(obj) {
@@ -112,6 +113,9 @@ function findSections(obj) {
     return sections;
 }
 var results = [];
+
+
+
 files.forEach(function(filename) {
     var text = fs.readFileSync('chapters/'+filename);
     MD.reset();
@@ -133,26 +137,29 @@ var toc = {
     sections: results,
 }
 fs.writeFileSync('build/toc.html',Mustache.render(toc_templ,toc));
+
+count = 0;
+results = [];
+var oscon = ['lecture1.md','handson1.md','lecture2.md','handson2.md'];
+oscon.forEach(function(filename) {
+    var text = fs.readFileSync('2014/'+filename);
+    MD.reset();
+    var rendered = MD.matchAll(text.toString(),'start');
+    rendered.number = count;
+    var text = Mustache.render(chapter_template,rendered);
+    fs.writeFileSync('build_2014/chapter'+count+'.html',text);
+    results.push({
+        title: findTitle(rendered.sections),
+        sections: findSections(rendered.sections),
+        filename: 'chapter'+count+'.html',
+    });
+    count++;
+})
+
+
+var toc = {
+    bookname: 'HTML Canvas Deep Dive',
+    sections: results,
+}
+fs.writeFileSync('build_2014/toc.html',Mustache.render(toc_templ,toc));
 //console.log(Mustache.render(toc_templ,toc));
-
-
-
-/*
-
-
-the joshdown parser needs to handle
-
-headers, for rendering and to capture as sections for later TOC processing
-paragraphs with inline styles
-lists
-code setions
-
-paragraphs marked as notes
-an image marked as a figure with a title
-a list of images marked as a photo gallery
-a code section marked as interactive, with all of the correct code generated
-an inline link marked as a glossary item
-an inline link to external vs internal reference.
-
-
-*/

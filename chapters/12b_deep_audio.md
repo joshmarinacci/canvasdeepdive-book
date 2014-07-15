@@ -1,4 +1,4 @@
-### Lecture Part 2
+### Advanced Audio Synthesis
 
 Now that we have the game running. Let's make it better with some real sound.
 
@@ -22,7 +22,9 @@ almost any sound can be created by adding enough sine waves together. Here's
 what a simple sine wave looks like. You should remember this from highschool
 math.
 
+```
 Wave Visualizer
+```
 
 Digital audio is just analog audio, like our sine wave here, chopped up into
 tiny pieces called samples. A sample is just a number from -1 to 1. Most digital
@@ -53,7 +55,9 @@ fill the sound with values taken from a file. This would be pre-recorded audio,
 like an MP3 or wave file. However, we are filling the array with a sine wave.
 This is what it sounds like.
 
+```
 [Sound Play]()
+```
 
 This is a plain sine wave so it has that pure tone sound. The value we put into
 the sine function is called _theta_, as you may remember from your trig classes.
@@ -74,13 +78,17 @@ Let's try a stranger one: `sin(t) + sin(t*1.01)`. This gives us a
 funky wobbling sound. It's because we have two waves that are almost identical
 but not quite. Let's look at waht's really going on here in the visualizer.
 
+```
 Wave Visualizer
+```
 
 Everything I've shown you so far is pure sine waves, but there are other kinds
 of waves too. In digital music we will commonly use the square wave and sawtooth
 waves. We can also use random numbers to give us pure noise.
 
+```
 more demos
+```
 
 After playing around with some different functions I found this nice 70s scifi
 movie sound:
@@ -91,14 +99,17 @@ function wave(t) {
 }
 var base = mix(wave(t*1.000), wave(t*1.005));
 ```
+
+```
 70s Synth
+```
 
 ## Notes
 
 Playing with tones is certainly fun, but if we want to make music we need to
 turn them into musical notes. That means working with specific frequencies.
 Let's start by making _t_ go from 0 to 1 over one second. Then we multiply by
-2*PI, which is the length of one cycle, and then by the frequency we want.
+_2PI_, which is the length of one cycle, and then by the frequency we want.
 Middle C on a piano has a frequency of 261.626, so the equation looks like this:
 
 ```
@@ -120,11 +131,13 @@ jsnode.onaudioprocess = function(e) {
     }
 }
 ```
+
 Now we want to play some tones in sequence as notes.  To do this we need to
 decide how long a note is,  then choose a new frequency every time we hit that
 note. Let's start with our music scale with
 the [piano frequencies](http://en.wikipedia.org/wiki/Piano_key_frequencies) from
 Wikipedia.
+
 
 ```
 var scale = {
@@ -157,6 +170,7 @@ fourth, or 0.25, seconds per note. Doing a `floor()` of this value gives us an
 integer that increases. The mod (%) by `notes.length` makes it wrap around so that
 it continually loops through the notes array. Now we can combine the note with
 our tone generator like this:
+
 
 ```
 function tone(t,freq) {

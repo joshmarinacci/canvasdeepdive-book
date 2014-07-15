@@ -226,7 +226,9 @@ Markdown.header = function(level, text) {
         text: text
     };
     this.openBlock('h'+level);
+    this.append('<a id="'+id+'">');
     this.append(text);
+    this.append('</a>');
     this.closeBlock('h'+level);
 }
 

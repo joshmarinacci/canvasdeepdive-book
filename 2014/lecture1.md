@@ -1,4 +1,4 @@
-### HTML Canvas Deep Dive
+### HTML Canvas Intro / Lecture Part 1
 ## Josh Marinacci
 
 Hi. Hello. Good morning. Thank you for joining me today at this early hour. We
@@ -201,7 +201,7 @@ for(var i=0; i<data.length; i++) {
 
 And it looks like this.
 
-![mammal chart v1](../2014/lecture1_01.png)
+![mammal chart v1](../2014/lecture1_01.png).screenshot
 
 Hmm. That doesn't look so good. Most of our values are off the edge. We need
 to scale the data down and move it over a bit
@@ -218,7 +218,7 @@ ctx.fillRect(
 Okay. That's better. We can at least see it all now. Next, let's add some text
 and lines for the axes.
 
-![mammal chart v2](../2014/lecture1_02.png)
+![mammal chart v2](../2014/lecture1_02.png).screenshot
 
 ```
 ctx.beginPath();
@@ -232,7 +232,7 @@ ctx.fillText('age',20,30);
 ctx.fillText('mass',100,385);
 ```
 
-![mammal chart v3](../2014/lecture1_03.png)
+![mammal chart v3](../2014/lecture1_03.png).screenshot
 
 A few things to note: first, the coordinate system increases from left to right
 for the x axis, but goes from top to bottom in the y direction, unlike regular math.
@@ -286,7 +286,7 @@ usual web way with CSS.
 
 which looks like this:
 
-![mammal chart v5](../2014/lecture1_05.png)
+![mammal chart v5](../2014/lecture1_05.png).screenshot
 
 So that is the basics of canvas. You get a context, set the fill color, then draw your shapes. Simple
 and fast.  Now let's switch to the hands on. In this hands on you'll use canvas to build
