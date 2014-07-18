@@ -126,7 +126,7 @@ awesome.
 
 ---
 
-### Bluetooth Low Energy
+### BLE: Bluetooth Low Energy
 
 @note http://en.wikipedia.org/wiki/Bluetooth_low_energy
 
@@ -142,6 +142,19 @@ kind of protocol.  While it does use the same frequencies it doesn't use
 streams of data. Rather it has a bunch of key value pairs called Characteristics.
 These are grouped into sets called profiles. It is these profiles that let
 you communicate between devices.
+
+@note It's important to understand that Bluetooth Low Energy really has nothing
+to do with regular Bluetooth. It was originally developed by Nokia as
+under the name Wibree. The Bluetooth Special Interest group adopted it
+and cleaned it up, then renamed it BLE.  Some devices support both ble and
+classic, some just support BLE. If you buy a breakout board for your arduino
+it will probably support one or the other but not both.
+
+@note Very low bandwidth, on the order of 5-10kps. power savings is the most important
+feature. You really can make a device that will run for a year on a coin cell
+battery.
+
+
 
 
 
@@ -265,10 +278,21 @@ iOS code to send 'Left motor on command'
 
 ---
 
-So this is pretty cool, but I could already do this with a physical serial cable.
-The only difference is the wires. But what about something that really needs
-the low power, like a smartwatch.  Here's a quick one I built using
-the Xadow system from Seeedstudio.
+I learned a few lessons from this project. First, using the prefab apps is
+limiting, but it's quite fast for prototyping purposes. Second, BLE can very
+easily be overwhelmed by interference; and not just from other RF. I got tons of
+noise from the motor driver shield. I ended up having to move it to the side and
+wire it up by hand instead of stacking it. Also, when you use multiple shields,
+look up which pins they all use. I found that the docs may not be complete. For
+example, the BLE shield uses several control pins, but also the SPI bus, which I
+has it's own pins.
+
+So this is pretty cool, but I could already do this with a physical serial
+cable. The only difference is the lack of wires. Which, with a mobile robot, is
+really important.
+
+But what about something that really needs the low power, like a smartwatch.
+Here's a quick one I built using the Xadow system from Seeedstudio.
 
 ---
 

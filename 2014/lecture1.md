@@ -34,7 +34,7 @@ So, welcome and enjoy.
 ## Data Visualization
 
 Data visualization is just what it sounds like, visualizing data. _Making data
-visual_. Fundamentally we are mapping data, usually numbers, into something
+visual_. Fundamentally we are mapping data -- usually numbers -- into something
 visual. We do this because humans are visual creatures. While we can read a
 table of numbers we can't readily draw conclusions from it. The numbers are too
 abstract. But if we transform those numbers into something visual, like the
@@ -123,7 +123,7 @@ functions to fill in those pixels with shapes, text, and images. Once a pixel is
 set it stays set until we change it. That's all Canvas does for us. Setting
 pixels. If we want to do animation, or complex shapes, or user interaction; then
 we have to do it ourselves with extra code. Canvas only knows about pixels. This
-makes Canvas some what low level but very powerful and fast.
+makes Canvas somewhat low level but very powerful and fast.
 
 In the second lecture we will dive into Scalable Vector Graphics, or SVG. As the
 name suggests SVG is all about vector graphics, or shapes. The browser reserves
@@ -139,7 +139,7 @@ level rather than the pixel level.
 There is a trade off of course. Because it is lower level, Canvas can do things
 SVG can't, but at the cost of more code. We can't set individual pixels or edit
 images with SVG, and historically SVG was slower than Canvas and not supported
-in all browser. These days, however, SVG is fast enough and works pretty much
+in all browsers. These days, however, SVG is fast enough and works pretty much
 everywhere, so the choice really comes down to which API makes sense for your
 task. If you are doing something more pixel-ish, then go with Canvas. If you are
 doing something with lots of shapes, go with SVG.
@@ -155,14 +155,14 @@ kilograms (I've made up these numbers).
 ```
 <script type='text/javascript'>
 var data = [
-    { name: 'tiger', age: 23, mass:  1500  },
-    { name: 'lion',  age: 28, mass:  2500  },
-    { name: 'rat',   age: 3,  mass:  0.13  },
-    { name: 'cat',   age: 9,  mass:  4.8   },
-    { name: 'deer',  age: 8,  mass:  96    },
-    { name: 'cow',   age: 15, mass:  1200  },
-    { name: 'elephant', age: 36, mass: 3500 },
-    { name: 'human', age: 85, mass: 140 },
+    { name: 'tiger',    age: 23,  mass:  1500  },
+    { name: 'lion',     age: 28,  mass:  2500  },
+    { name: 'rat',      age: 3,   mass:  0.13  },
+    { name: 'cat',      age: 9,   mass:  4.8   },
+    { name: 'deer',     age: 8,   mass:  96    },
+    { name: 'cow',      age: 15,  mass:  1200  },
+    { name: 'elephant', age: 36,  mass: 3500   },
+    { name: 'human',    age: 85,  mass: 140    },
 ]
 </script>
 ```
@@ -179,7 +179,7 @@ var ctx   = chart.getContext('2d');
 var w = 600;
 var h = 400;
 ctx.fillStyle = '#f0f0ff';
-ctx.fillRect(0,0,w,h);
+ctx.fillRect(0, 0, w, h);
 </script>
 </body>
 </html>
@@ -193,9 +193,9 @@ for(var i=0; i<data.length; i++) {
     ctx.fillStyle = '#0000ff';
     ctx.fillRect(
         mammal.mass, // x coordinate
-        mammal.age, // y coordinate,
-        10, //height
-        10 //width
+        mammal.age,  // y coordinate,
+        10,          //height
+        10           //width
         )
 }
 ```
@@ -205,12 +205,12 @@ And it looks like this.
 ![mammal chart v1](lecture1_01.png).screenshot
 
 Hmm. That doesn't look so good. Most of our values are off the edge. We need
-to scale the data down and move it over a bit
+to scale the data down and move it over a bit.
 
 ```
 ctx.fillRect(
     mammal.mass / 30 + 40,
-    mammal.age*3 + 40,
+    mammal.age * 3 + 40,
     5,
     5
     )
@@ -229,8 +229,8 @@ ctx.lineTo(590,390);
 ctx.stroke();
 
 ctx.fillStyle = 'black';
-ctx.fillText('age',20,30);
-ctx.fillText('mass',100,385);
+ctx.fillText('age', 20, 30);
+ctx.fillText('mass', 100, 385);
 ```
 
 ![mammal chart v3](lecture1_03.png).screenshot
@@ -254,7 +254,7 @@ circle function like this.
 ```
 function circle(ctx, cx, cy, radius) {
     ctx.beginPath();
-    ctx.arc(cx,cy,radius,0,Math.PI*2, false);
+    ctx.arc(cx, cy, radius, 0, Math.PI*2, false);
     ctx.fill();
 }
 ```
@@ -289,7 +289,7 @@ which looks like this:
 
 ![mammal chart v5](lecture1_05.png).screenshot
 
-So that is the basics of canvas. You get a context, set the fill color, then
+So that is the basics of Canvas. You get a context, set the fill color, then
 draw your shapes. Simple and fast.  Now let's switch to the hands on. In this
 hands on you'll use canvas to build a bar chart and pie chart from scratch.
 
