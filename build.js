@@ -94,7 +94,7 @@ processBook({
 */
 
 processBook({
-    files: ['lecture1.md','handson1.md','lecture2.md','handson2.md'],
+    files: ['lecture1.md','handson1.md','lecture2.md','handson2.md','lecture3.md'],
     basepath: '2014/',
     outdir: 'build2014',
     imagepath: '2014/',
