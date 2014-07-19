@@ -109,3 +109,9 @@ by putting it into a well designed picture can we bring out what is important. L
 [Why Data Visualizations](https://www.dashingd3js.com/why-data-visualizations)
 
 Thank you
+
+
+
+[D3 API Reference](https://github.com/mbostock/d3/wiki/API-Reference)
+
+[More D3 Examples](https://github.com/mbostock/d3/wiki/Gallery)
