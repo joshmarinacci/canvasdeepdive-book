@@ -93,6 +93,12 @@ public ones. For example, a search for 'energy' turns up 634 items.
 [Quandl](http://www.quandl.com) is another aggregator which also has converters to download data
 in different formats like JSON.
 
+[Census.gov](http://census.gov)  The classic dataset.
+
+[CIA World Fact Book](https://www.cia.gov/library/publications/the-world-factbook/)  Watching the World.
+
+
+
 ## Getting Geo Data
 If you are working on mapping projects you'll also want some GeoData. First start
 by searching for GeoJSON files, then look up other data sets in the Shape format. There are
