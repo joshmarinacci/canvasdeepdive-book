@@ -142,7 +142,8 @@ function processBook(args) {
 
     MD.classProcessors['screenshot'] = function(append, text, href) {
         var image_in = args.imagepath+href;
-        var name = "img"+Math.round(Math.random()*10000)+".png";
+        var ext = href.substring(href.lastIndexOf('.'));
+        var name = "img"+Math.round(Math.random()*10000)+ext;
         var image_out = image_out_path+'/'+name;
         console.log("copying",image_in,"to",image_out);
         copyFile(image_in,image_out);

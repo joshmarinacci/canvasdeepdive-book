@@ -53,7 +53,7 @@ me to see things that might be invisible otherwise.
 
 Now you need a map. D3 has built in support for a mapping standard called
 [GeoJSON](http://geojson.org). GeoJSON is a simple format for geographic data
-structures.  Scott put a geojson map of the United States in the gitrepo for his
+structures.  Scott put a geojson map of the United States in the git repo for his
 book. You can download `us-states.json` from
 [here](https://github.com/alignedleft/d3-book/tree/master/chapter_12). Put the
 file in the same directory as your html page.

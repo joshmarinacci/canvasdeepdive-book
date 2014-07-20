@@ -70,10 +70,13 @@ Standford University as a replacement for their earlier framework, Protovis.
 
 D3 is very powerful while still being accessible. Here are a few examples.
 
-* A [colored map](http://bl.ocks.org/mbostock/4060606) of unemployment rates.
-* A [polar clock](http://bl.ocks.org/mbostock/1096355)
-* A draggable graph of [mobile patent lawsuits](http://bl.ocks.org/mbostock/1153292).
-* A chord diagram of [software class relationships](http://bl.ocks.org/mbostock/1046712).
+A [colored map](http://bl.ocks.org/mbostock/4060606) of unemployment rates.
+
+A [polar clock](http://bl.ocks.org/mbostock/1096355)
+
+A draggable graph of [mobile patent lawsuits](http://bl.ocks.org/mbostock/1153292)
+
+A chord diagram of [software class relationships](http://bl.ocks.org/mbostock/1046712)
 
 
 
@@ -85,6 +88,8 @@ you made in the hands on lab. We will start by creating the SVG element using
 the D3 API in Javascript.
 
 ```
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script type='text/javascript'>
 var w = 500;   // save our width and height for later
 var h = 100;
 var dataset = [ 5, 10, 15, 20, 25,];
@@ -196,7 +201,7 @@ Here's what it looks like with proper y scaling.
 There are other kinds of scales besides linear. Log is very useful when
 tracking exponential trends like Moore's law.
 
-![example of moores law log graph](asdf.png)
+![example of moores law log graph](mooreslaw.svg).screenshot
 
 
 ## Updating Data
@@ -346,7 +351,6 @@ There we go. Much better.
     image: "lecture2_06.png"
     text: "Styled and Animated Bar Chart"
 }}
-
 
 
 D3 is a very powerful SVG framework. It can do animation, handle user events, style
