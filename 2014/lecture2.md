@@ -243,7 +243,12 @@ wouldn't make any difference.
 
 Here's what it looks like.
 
-[without animation](../../d3tutorial/demo2.html)
+{{
+    type: "interactive"
+    href: "d3tutorial/demo2.html"
+    image: "lecture2_04a.png"
+    text: "Without Animation"
+}}
 
 
 Hmm. That doesn't look too good. The data changes but the bars just suddenly
@@ -261,7 +266,13 @@ come in one after another over a second, creating a fun animated effect.
         })
 ```
 
-[with animation](../../d3tutorial/demo3.html)
+
+{{
+    type: "interactive"
+    href: "d3tutorial/demo3.html"
+    image: "lecture2_04b.png"
+    text: "Wit Animation"
+}}
 
 
 There's one more thing we need: a Y axis. We can see which bar is biggest but we
@@ -284,7 +295,7 @@ svg.append('g')
 
 {{
     type: "interactive"
-    href: "../../d3tutorial/demo4.html"
+    href: "d3tutorial/demo4.html"
     image: "lecture2_05.png"
     text: "Animated bar chart"
 }}
@@ -347,7 +358,7 @@ There we go. Much better.
 
 {{
     type: "interactive"
-    href: "../../d3tutorial/demo5.html"
+    href: "d3tutorial/demo5.html"
     image: "lecture2_06.png"
     text: "Styled and Animated Bar Chart"
 }}
