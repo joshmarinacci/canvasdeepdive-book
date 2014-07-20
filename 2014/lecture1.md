@@ -2,6 +2,16 @@
 ### HTML Canvas Intro / Lecture Part 1
 ## Josh Marinacci
 
+
+
+# http://joshondesign.com/p/books/oscon2014/build2014/toc.html
+
+# joshua@marinacci.org
+
+# @joshmarinacci
+
+
+
 Hi. Hello. Good morning. Thank you for joining me today at this early hour. We
 are going to cover HTML canvas and some other web based graphics technologies. I
 say _we_ because this isn't a solo endeavor. Please feel free to raise your hand
