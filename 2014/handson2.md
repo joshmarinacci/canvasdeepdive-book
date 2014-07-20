@@ -209,9 +209,10 @@ for(var i=1; i<=10; i++) {
 
 This code will create a list of green colors going from black to pure green. Now
 create a new _quantize_ scale using the list of colors as the range ( _outputs_ )
-and set the domain ( _inputs_ ) from the min and max of the data. Since you
-will access the data over and over, create a `getValue` function to pull
-it out.
+and set the domain ( _inputs_ ) from the min and max of the data. Since you will
+access the data over and over, create a `getValue` function to pull it out.
+This should all go _inside_ the `d3.csv` so that the data variable exists when
+this is called.
 
 
 ```
