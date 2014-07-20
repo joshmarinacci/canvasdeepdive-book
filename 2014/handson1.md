@@ -18,20 +18,20 @@ core Chromium or full-blown Chrome):
 
 
 ```
-chromium-browser --disable-web-security
+chromium-browser --allow-file-access-from-files --disable-web-security
 ```
 
 or
 
 ```
-google-chrome --disable-web-security
+google-chrome --allow-file-access-from-files --disable-web-security
 ```
 
 
 On Windows this would be:
 
 ```
-chrome.exe --disable-web-security
+chrome.exe --allow-file-access-from-files --disable-web-security
 ```
 
 Alternatively, you can load the pages through a local webserver.
