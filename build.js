@@ -85,13 +85,14 @@ function findSections(obj) {
 }
 
 
-/*
+
 processBook({
     files: files,
     basepath: 'chapters/',
-    outdir: 'build2',
+    outdir: 'buildbook',
+    imagepath:'chapters/',
+    demopath:'chapters',
 });
-*/
 
 processBook({
     files: ['lecture1.md','handson1.md','lecture2.md','handson2.md','lecture3.md'],
