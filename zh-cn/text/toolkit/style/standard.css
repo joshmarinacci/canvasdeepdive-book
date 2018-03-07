@@ -36,7 +36,7 @@ h2 {
 	font-size: 130%;
 }
 h3 {
-	font-size: 200%;
+	font-size: 150%;
 }
 
 
@@ -54,9 +54,8 @@ h3 {
 	background-position: 100% 100%;
 	background-repeat: repeat;	
 }
-#header h1 { color: white; }
+#header h1 { color: white; text-shadow: 3px -3px 0px black; }
 #header h2 { color: black; }
-
 
 /*  ==========  basic structure  =========  */
 
@@ -96,7 +95,7 @@ body {
 }
 
 
-#header h1 { font-size:  350%; }
+#header h1 { font-size:  300%; }
 #header h2 { padding-top: 1em; }
 
 
