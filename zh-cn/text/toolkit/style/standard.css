@@ -16,8 +16,8 @@
 }
 
 #content {
-	font-size: 13pt;
-    font-family: 'Crimson', Georgia, Times, serif;
+	font-size: 14pt;
+	font-family: 'Crimson', Georgia, Times, serif;
 }
 p {
 	line-height: 140%;
@@ -228,20 +228,27 @@ th {
     list-style: none;
 }
 
-#header {
+#header, #footer {
 	position: relative;
 }
 
-.chapnav {
+#footer {
+	margin: 30px 0;
+}
+
+#header .chapnav {
 	position: absolute;
-	z-index: 1;
+	z-index: 1;	
+}
+
+.chapnav {
     padding: 0.5em;
     padding-top: 0;
     border: 0px solid black;
     left: 0;
 	right: 0;
 	top: 20px;
-    font-size: 130%;
+    font-size: 18px;
     font-weight: normal;
     text-transform: none;
     font-family: Gothic, Helvetica, Verdana, Arial, sans-serif;
@@ -250,4 +257,7 @@ th {
 .chapnav a {
 	float: left;
 	width: 33.3%;
+	border: none;
+    text-decoration: underline;
+    text-align: center;
 }
