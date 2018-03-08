@@ -12,6 +12,7 @@
 	border-radius:15px;
 	margin: 1em;
 	padding: 0;
+	user-select: none;
 }
 
 
@@ -29,6 +30,8 @@
 	border: 0px solid purple;
 	padding: 0;
 	margin: 0;
+	width: 480px;
+	height: 300px;
 }
 /* actual content */
 .swipe ul li {
@@ -37,6 +40,7 @@
 	padding: 0;
 	margin: 0;
 	vertical-align: middle;
+	list-style: none;
 }
 
 
@@ -47,9 +51,11 @@
 	padding: 0;
 	margin: 0;
 	text-align: center;
+	padding-bottom: 8px;
 }
 
 .gallery h5 {
+	color: #fff;
 	font-family: sans-serif;
 	font-weight: normal;
 	padding: 0.3em 0em;
@@ -72,6 +78,13 @@
 	font-weight: normal;
 	padding-left: 1em;
 	padding-right: 1em;
+	cursor: pointer;
+	color: #ddd;
+	text-decoration: none;
+	font-family: 'arial, 宋体';
+}
+.gallery a:hover {
+	color: #fff;
 }
 .gallery nav em {
 	font-style: normal;

@@ -235,7 +235,6 @@ function Canvas(engine,domCanvas) {
 	this.processEvent = function(type,domCanvas,e,et) {
 	    e.preventDefault();
         var point = self.calcLocalXY(domCanvas,et);
-        console.log(point, e)
         var node = self.findNode(point);
     	for(var i=0; i<self.listeners.length; i++) {
     		var listener = self.listeners[i];
@@ -508,7 +507,7 @@ function AminoNode() {
             self.parent.setDirty();
         }
     }
-    this.contains = function () {}
+    this.contains = function () { return true}
 }
 
 /*

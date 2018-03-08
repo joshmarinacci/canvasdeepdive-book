@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>深入理解 HTML Canvas 第一章 基础绘图</title>
+	<link rel="stylesheet" type="text/css" href="./toolkit/style/master.css">
+	<script src='toolkit/scripts/jquery.js'></script>
+    <script src='toolkit/scripts/setup.js'></script>
+    <script src='toolkit/scripts/jangle.js'></script>
+</head>
+
+<body>
+<div id="header">
+	<h2>第一章</h2>
+	<h1>基础绘图</h1>
+</div>
+
+<div id="content">
+<h3>
+	<a id="overview">概述</a>
+</h3>
+<p>
+	Canvas 是最近添加到HTML中的2D绘图API，已被众多浏览器支持。Canvas允许你直接绘制任何你需要的图形而无需使用 Flash 或 Java 插件。
+	在这看似简单的API中，Canvas 能够变革我们如何构建各种设备 Web 应用，并不局限于桌面。
+</p>
+
+<p>
+	以下的截图让你对 Canvas 有个初步了解。
+</p>
+
+<div id='gallery' class='gallery' style="width:480px;">
+	<h5>HTML Canvas 制作Web App</h5>
+	<div id='slider' class='swipe'>
+		<ul>
+			<li>
+				<img src="images/screenshot1.png" />
+			</li>
+			<li style='display:none;'>
+				<img src="images/screenshot2.png" />
+			</li>
+			<li style='display:none;'>
+				<img src="images/screenshot3.png" />
+			</li>
+			<li style='display:none;'>
+				<img src="images/screenshot4.png" />
+			</li>
+			<li style='display:none;'>
+				<img src="images/screenshot5.png" />
+			</li>
+			<li style='display:none;'>
+				<img src="images/screenshot6.png" />
+			</li>
+		</ul>
+	</div>
+</div>
+
+<h3>
+	<a id="what_is_canvas">Canvas 是什么？</a>
+</h3>
+
+<p>
+	Canvas 提供了 2D 绘图 API。浏览器提供了一个能供你作图的矩形区域，画线、画形状、图片以及文本，你能想到的都可以绘制。Canvas 最初由苹果公司
+	给它的仪表 <span class='glossary' title='A feature of Mac OS X, since 10.4. Enables desktop widgets written in HTML, JavaScript, and CSS'>Dashboard</span> 组件所开发的。
+	以下是一个关于 Canvas 代码简单的例子：
+</p>
+<pre class='wrap'>
+<code>&lt;html&gt;
+&lt;body&gt;
+&lt;canvas width=&quot;800&quot; height=&quot;600&quot; id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
+&lt;script&gt;
+	var canvas = document.getElementById('canvas');
+	var c = canvas.getContext('2d');
+	c.fillStyle = &quot;red&quot;;
+	c.fillRect(100,100,400,300);
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code>
+</pre>
+<div class="photo">
+	<img src="images/redrect.png" />
+	<p><b>快照</b> 简单红色矩形</p>
+	<p>
+		<i>使用 context.fillRect() 函数绘制矩形。</i>
+	</p>
+</div>
+
+<p>
+	理解 Canvas 绘制像素这点非常重要。它没有使用形状或者向量，也没有将对象绑定到事件处理程序上。它仅仅将像素绘制到屏幕上。如我们所说的，这有优点及缺点。
+</p>
+
+<h3>
+	<a id="canvas_vs_svg_vs_dom">在 Web 中还剩哪部分工作适合 Canvas 做？</a>
+</h3>
+
+<p>
+	在Web中，有四种方式绘制图形：Canvas、SVG、CSS以及直接的 DOM 动画。
+	Cavnas 与其他三个方式都不相同。
+</p>
+
+<p>
+	<b>SVG</b>:
+	<span class="glossary" title="可缩放矢量图形是基于可扩展标记语言（标准通用标记语言的子集），用于描述二维矢量图形的一种图形格式">SVG</span>
+	是矢量绘制图形的API。每个图形拥有一个能绑定事件处理函数的对象。当你缩放矢量图，不会失真，而Canvas会像素化。
+</p>
+
+<p>
+	<b>CSS</b>:
+	<span class="glossary" title='层叠样式表。给原始的HTML页面添加样式的一种技术。允许作者控制页面颜色、字体、边框等样式。'>CSS</span> 
+	只给 DOM 元素添加样式。Canvas 中不存在 DOM 对象因此不能使用 CSS 设置样式。CSS 仅仅对矩形 canvas 元素有效，可以设置边框跟背景颜色。
+</p>
+
+<p>
+	<b>DOM 动画</b>:
+	<span class='glossary' title='Document Object Model. The tree structure that makes up a webpage. Every thing in the page is represented by one or more elements in the tree, such as links, paragraphs, headers, and images.'>DOM</span>，
+	或者 Document Object Model （文档对象模型）, 定义屏幕中每一个对象的所有东西。 DOM 动画（使用 CSS 以及 Javascript
+	改变对象属性）在某些情况下比 Canvas 动画要流畅，关键在于浏览器的执行策略。
+</p>
+
+<h3>
+	<a id='whichwhatwhen'>Which? What? When?</a>
+</h3>
+
+<p>
+	因此什么时候你应该在SVG、CSS或者DOM元素上使用Canvas？ Canvas 是以上最底层的，能够控制更多和使用更少的内存，但需要花费书写更多的代码。
+	当你已有图形（像 Adobe Illustrator中导出的地图）时使用SVG 渲染到屏幕上。当需要控制多个静态区域做运动时，或需要 3D 变换时使用 CSS 和 DOM 动画。
+	如果需要处理图表，图像，实时图像和视频游戏，Canvas 是最好的选择。之后的章节再介绍讨论一些类库让你用 Canvas 做更多的东西。
+</p>
+
+<p>
+	在我们进一步深入学习前，我先声明当我谈论 Canvas 的时候指的是 <b>2D</b> API，因为还有WebGL的3D API。我不打算涉及到这个因为3D接口还在
+	演进中同时浏览器的缺乏足够的支持。它本质上是JavaScript版的OpenGL，但比Canvas更低级更难应用。当WebGL更成熟的时候，我们会在后面的章节重新学习。
+</p>
+
+<h3>
+	<a id="browser_support">浏览器支持</a>
+</h3>
+
+<p>
+	最后，在我们应用 Canvas 之前，让我们聊聊 <b>哪里</b> 能使用 Canvas。现在 Canvas 是一个稳定的 API 以及所有现代浏览器都已经支持。
+	即使是 IE9 也开始支持，实现还不错。
+</p>
+
+<table>
+	<tr>
+		<th>桌面浏览器</th>
+		<th>版本</th>
+	</tr>
+	<tr>
+		<td>Safari</td>
+		<td>3.0+</td>
+	</tr>
+	<tr>
+		<td>Chrome</td>
+		<td>10+</td>
+	</tr>
+	<tr>
+		<td>Opera</td>
+		<td>9+</td>
+	</tr>
+	<tr>
+		<td>FireFox</td>
+		<td>4.0+</td>
+	</tr>
+	<tr>
+		<td>Internet Explorer</td>
+		<td>9.0+</td>
+	</tr>
+</table>
+
+<p>
+	移动端中大部分平台已支持，因为大多数都是基于具有良好支持的WebKit内核。
+	就我所知 webOS，iOS 以及安卓都已支持。
+</p>
+<table>
+	<tr>
+		<th>移动浏览器</th>
+		<th>Version</th>
+	</tr>
+	<tr>
+		<td>iOS</td>
+		<td>all</td>
+	</tr>
+	<tr>
+		<td>webOS</td>
+		<td>all</td>
+	</tr>
+	<tr>
+		<td>Android</td>
+		<td>2.0+</td>
+		</td>
+	</tr>
+	<tr>
+		<td>BlackBerry</td>
+		<td>Playbook and OS 6.0+</td>
+	</tr>
+	<tr>
+		<td>Windows Phone</td>
+		<td>7+</td>
+	</tr>
+</table>
+
+<p>Now, not every mobile device has very complete or
+	<i>fast</i> support for Canvas, so we'll look at how to optimize our code for mobile devices later in the performance section
+	of this session.
+</p>
+
+
+<h3>
+	<a id="simple_drawing">简易绘制</a>
+</h3>
+
+<p>
+	如我所说，Canvas 是简单的2D API。如果你写过Flash或者Java 2D代码会发现很多相似。你会得到一个图像上下文的引用，来设置当前填充颜色或描述颜色，
+	绘制图形。下面是一些例子。
+</p>
+<p>
+	在该例子中，我们设置了当前的颜色为红色然后绘制一个矩形。
+	<b>拖拽代码中的数字以改变数值，然后观察对矩形的影响</b>
+</p>
+
+<div id="simplerect" class='jangle'>
+	<canvas width="300" height="100"></canvas>
+<pre>
+
+</pre>
+	<div class='popup shadow'>000</div>
+</div>
+
+<script type="text/javascript" class='bookscript'>
+	$(document).ready(function () {
+		function drawit(ctx, var1, var2, var3, var4) {
+ctx.fillStyle = "red";
+//x, y, width, height
+ctx.fillRect(var1, var2, var3, var4);
+		}
+		var tangle = new Jangle();
+		tangle.drawfun = drawit;
+		tangle.vars = {
+			var1: 20,
+			var2: 30,
+			var3: 40,
+			var4: 50,
+		};
+		tangle.setup("simplerect");
+	});
+</script>
+
+<p>另一例子：</p>
+
+<div id="simple_triangle" class='jangle'>
+	<canvas width="300" height="100"></canvas>
+	<pre></pre>
+	<div class='popup shadow'>000</div>
+</div>
+
+<script type="text/javascript" class='bookscript'>
+	$(document).ready(function () {
+		function drawit2(c, var1, var2, var3) {
+c.fillStyle = '#ccddff';
+c.beginPath();
+c.moveTo(50, 20);
+c.lineTo(200, 50);
+c.lineTo(var1, var2);
+c.closePath();
+c.fill();
+c.strokeStyle = 'rgb(0,128,0)';
+c.lineWidth = var3;
+c.stroke();
+		}
+		var jangle2 = new Jangle();
+		jangle2.drawfun = drawit2;
+		jangle2.vars = {
+			var1: 150,
+			var2: 80,
+			var3: 5
+		};
+		jangle2.setup("simple_triangle");
+	});
+</script>
+<p>
+	在该例子中，我们设置了当前填充颜色、创建了一个路径，然后填充以及描边。
+	记住上下文分别保留了填充及描边颜色的路径。同时注意到指定颜色的不同形式。
+	<code>fillStyle</code> 和
+	<code>strokeStyle</code> 为有效的 CSS 颜色表示法，例如十六进制，关键字，或者
+	<code>rgb()</code> 函数。</p>
+</p>
+<h3>
+	<a id="paths">路径</a>
+</h3>
+
+<p>
+	Canvas 只支持直接绘制矩形。绘制其他的图形必须先绘制路径。
+	路径是通过一簇直线或曲线部分组成的形状。在 Canvas 中，定义路径必须先使用<code>beginPath()</code>，然后能够填充、描边或者裁剪。
+	定义直线部分使用函数
+	<code>moveTo()</code>、
+	<code>lineTo()</code>和
+	<code>bezierCurveTo()</code>。
+	这个例子绘制形状使用了 moveTo，接着使用贝塞尔曲线，然后使用一些直线。
+	创建路径之后填充以及描边。
+</p>
+
+<div id="simple_curve" class='jangle'>
+	<canvas width="300" height="100"></canvas>
+	<pre></pre>
+	<div class='popup shadow'>000</div>
+</div>
+
+<script type="text/javascript" class='bookscript'>
+	$(document).ready(function () {
+		function drawit3(c, varcx1, varcy1, varcx2, varcy2) {
+c.fillStyle = 'red';
+c.beginPath();
+c.moveTo(10, 30);
+c.bezierCurveTo(varcx1, varcy1, varcx2, varcy2, 200, 30);
+c.lineTo(200, 90);
+c.lineTo(10, 90);
+c.closePath();
+c.fill();
+c.lineWidth = 4;
+c.strokeStyle = 'black';
+c.stroke();
+		}
+		var jangle3 = new Jangle();
+		jangle3.drawfun = drawit3;
+		jangle3.vars = {
+			varcx1: 50,
+			varcy1: 90,
+			varcx2: 159,
+			varcy2: -30
+		};
+		jangle3.setup("simple_curve");
+	});
+</script>
+
+
+<h3>
+	<a id="coordinate_system">坐标系统</a>
+</h3>
+
+<p>
+	Canvas的原点（0, 0）在左上角，y轴正方向向下。这是传统的计算机图形坐标系，
+	但是如果你需要一个不同的原点可以使用形变改变，之后的章节会提到。
+	另一个重要的内容是 Canvas 规范定义坐标在左上角的一个像素。
+	这就意味着如果绘制一个竖直方向上（5, 0）的像素点，就会占据相邻的像素点（4.5 到 5.5）的各一半。
+	为了解决这个偏移问题，x坐标小数位为0.5。然后它将跨越0.5到5.5的左边和右边，就获得了一条从5.0到6.0的线。
+	同时，你也能使用等宽线，如2或者4。
+</p>
+	
+</p>
+<p class='photo'>
+	<img src="images/coords.png" />
+</p>
+
+<h3>
+	<a id="images">图像</a>
+</h3>
+
+<p>Cavnas 绘制图像使用
+	<code>drawImage</code> 函数。 </p>
+
+<p>There are several forms of
+	<code>drawImage</code>. You can draw the image directly to the screen at normal scale, 
+	or stretch and slice it how you like.
+	Slicing and stretching images can be very handy for special effects in games 
+	because image interpolation is often much
+	faster than other ways kinds of scaling.
+</p>
+<p>
+	有几种<code>drawImage</code>的使用形式。根据需要，可以直接在屏幕以正常尺寸绘图或者缩放裁切。
+	在游戏中的特定效果的图像裁切跟缩放非常方便。因为图像处理通常比其他方法缩放快得多。
+</p>
+
+
+<div id="imagedemo" class='jangle'>
+	<canvas width="400" height="100"></canvas>
+	<pre></pre>
+	<div class='popup shadow'>000</div>
+</div>
+
+<script type='text/javascript' class='bookscript'>
+	$(document).ready(function () {
+		var img = new Image();
+		img.onload = function () {
+			function drawit(ctx, var1, var2, s1, s2, s3, s4) {
+ctx.drawImage(img, 0, 0); //normal drawing
+ctx.drawImage(img, //draw stretched
+	0, 0, 66, 66, //source (x,y,w,h)
+	100, 0, var1, var2 //destination (x,y,w,h)
+);
+ctx.drawImage(img, //draw a slice
+	s1, s2, s3, s4, //source coords (x,y,w,h)
+	250, 0, 250, 50 //destination coords (x,y,w,h)
+);
+			}
+
+			var jangle = new Jangle();
+			jangle.drawfun = drawit;
+			jangle.vars = {
+				var1: 100,
+				var2: 100,
+				s1: 20,
+				s2: 10,
+				s3: 20,
+				s4: 20
+			};
+			jangle.setup("imagedemo");
+		}
+		img.src = 'images/smile.png';
+
+	});
+</script>
+
+<p>
+	请尝试拖拽变量理解一下拉伸及裁剪是如果工作的。
+	拉伸图片必须指定源坐标及目标坐标。源坐标指定图像的那部分像素显示。
+	源图片的大小是 67*67 像素，使用 （0， 0， 66， 66）即可显示完整的图片。
+	目标坐标系指定在画布的那个位置绘制图像，及尺寸。通过改变坐标的宽（w）高（h）来伸缩图像。
+</p>
+
+<p>
+	切片也是一样，但是不要使用超出图片尺寸的源坐标。
+	当你裁切一张图片时，注意不要超出图片的边界否则绘制的图片不存在。
+	例如，当你将上面例子的源宽度增加46，就会得到图片最右边的边缘像素。使用源x坐标也一样。
+</p>
+<h3>
+	<a id="text">文本</a>
+</h3>
+
+<p>
+	Canvas 也可以绘制文本。字体属性与CSS属性一样，所以可以设置样式，尺寸和字体。
+	<code>fillText(string,x,y)</code>函数绘制文本使用的是竖直对齐方式是<b>baseline</b>基线对齐，不是顶部对齐。
+	如果设置文本坐标在（0， 0），文本会绘制在画布的顶端。请保证y轴坐标适当低于某值。
+</p>
+
+<div id="textdemo" class='jangle'>
+	<canvas width="300" height="200"></canvas>
+	<pre></pre>
+	<div class='popup shadow'>000</div>
+</div>
+
+<script type="text/javascript" class='bookscript'>
+	$(document).ready(function () {
+
+		function drawit(ctx, var1, var2, var3) {
+ctx.fillStyle = "black";
+ctx.font = "italic " + var1 + "pt Arial ";
+ctx.fillText("this is text", var2, var3);
+		}
+		var tangle = new Jangle();
+		tangle.drawfun = drawit;
+		tangle.vars = {
+			var1: 96,
+			var2: 20,
+			var3: 150
+		};
+		tangle.setup("textdemo");
+	});
+</script>
+
+
+
+<h3>
+	<a id="gradient_fills">渐变</a>
+</h3>
+
+<p>
+	Canvas 同样能够使用渐变代替色块来填充形状。以下的是线性渐变：
+</p>
+<div id="graddemo1" class='jangle'>
+	<canvas width="400" height="200"></canvas>
+	<pre></pre>
+	<div class='popup shadow'>000</div>
+</div>
+
+<script type="text/javascript" class='bookscript'>
+	$(document).ready(function () {
+
+		function drawit(ctx, var1, var2) {
+var grad = ctx.createLinearGradient(0, 0, var1, var2);
+grad.addColorStop(0, "white");
+grad.addColorStop(0.5, "red");
+grad.addColorStop(1, "black");
+
+ctx.fillStyle = grad;
+ctx.fillRect(0, 0, 400, 200);
+		}
+		var tangle = new Jangle();
+		tangle.drawfun = drawit;
+		tangle.vars = {
+			var1: 200,
+			var2: 0
+		};
+		tangle.setup("graddemo1");
+	});
+</script>
+
+<p>
+	要记住的重要一点是，渐变填充是相对绘制图形所在的坐标系来的，而不是相对绘制图形的坐标。
+	例子中的图形绘制在点（0， 0），如果将图像改变在点（100， 100），渐变依然是相对于Canvas原点坐标的，只是更小的渐变图像会绘制，如下：
+</p>
+
+<div id="graddemo2" class='jangle'>
+	<canvas width="400" height="200"></canvas>
+	<pre></pre>
+	<div class='popup shadow'>000</div>
+</div>
+
+<script type="text/javascript" class='bookscript'>
+	$(document).ready(function () {
+
+		function drawit(ctx, var1, var2) {
+var grad = ctx.createLinearGradient(0, 0, var1, var2);
+grad.addColorStop(0, "white");
+grad.addColorStop(0.5, "red");
+grad.addColorStop(1, "black");
+
+ctx.fillStyle = grad;
+ctx.fillRect(100, 100, 400, 200);
+		}
+		var tangle = new Jangle();
+		tangle.drawfun = drawit;
+		tangle.vars = {
+			var1: 200,
+			var2: 0
+		};
+		tangle.setup("graddemo2");
+	});
+</script>
+
+<p>
+	如果你使用渐变填充形状，却只出现一种颜色，有可能就是你的坐标出错了。
+</p>
+<p>
+	以上都是一些基础绘制。基础到此为止，下一章节会做些训练。你需要有安装浏览器已经编辑器。
+	我推荐 <a target="blank" href="https://www.google.com/chrome">Chrome</a> ，Chrome 浏览器有良好的调试工具，以及编辑器
+	<a target="blank" href="http://www.jedit.org/">jEdit</a>，它是免费且跨平台的。当然，你也可以选择适合自己的浏览器和编辑器。
+</p>
+
+<div id="glossary_popup" class='shadow'>
+	<h4>foo</h4>
+	<p>blah</p>
+</div>
+<div id="footer">
+	<div class='chapnav bottom'>
+		<a class="prevchap" href="title.html">上一章</a>
+		<a class="toclink" href="toc.html">目录</a>
+		<a class="nextchap" href="chapter02.html">下一章</a>
+	</div>
+</div>
+
+<script type="text/javascript" class='bookscript'>
+	setupPhotoGallery("gallery");
+
+	function setupPhotoGallery(id) {
+
+		var gal = document.getElementById(id);
+		var nav = document.createElement("nav")
+		gal.appendChild(nav);
+
+
+		//add previous button
+		var prev = document.createElement("a");
+		prev.innerHTML = "&lt; prev"
+		$(prev).click(function (e) {
+			slider.prev();
+		});
+		nav.appendChild(prev);
+
+
+		//create span with the bullets
+		var span = document.createElement("span");
+		span.id = "position";
+		var imageCount = gal.getElementsByTagName("ul")[0].getElementsByTagName("img").length;
+		span.innerHTML = "<em class='on'>&bull;</em>";
+		for (var i = 1; i < imageCount; i++) {
+			span.innerHTML += "<em>&bull;</em>";
+		}
+		nav.appendChild(span);
+
+
+		//add next button
+		var next = document.createElement("a");
+		next.innerHTML = "next &gt;";
+		$(next).click(function (e) {
+			slider.next();
+		});
+
+		nav.appendChild(next);
+
+		// slider
+		//var bullets = document.getElementById('position').getElementsByTagName('em');
+		var bullets = span.getElementsByTagName('em');
+		//    console.log("bullets num = " + bullets.length);
+		function Swipe (element, options) {
+			this.pos = 0
+			this.length = bullets.length
+			this.container = element
+			if (options && typeof options.callback === 'function') {
+				options.callback(element, this.pos)
+			}
+		}
+		Swipe.prototype = {
+			constructor: Swipe,
+
+			prev: function () {
+				this.pos--
+				if (this.pos < 0) {
+					this.pos = this.length - 1
+				}
+				var i = this.length
+				while (i--) {
+					bullets[i].className = ' ';
+				}
+				bullets[this.pos].className = 'on';
+				this.tab()
+			},
+			next: function () {
+				this.pos++
+				if (this.pos > this.length - 1) {
+					this.pos = 0
+				}
+				var i = this.length
+				while (i--) {
+					bullets[i].className = ' ';
+				}
+				bullets[this.pos].className = 'on';
+				this.tab()
+			},
+			tab: function () {
+				$(this.container).find('li').hide().eq(this.pos).fadeIn()
+			}
+		}
+		var slider = new Swipe(document.getElementById('slider'), {
+			callback: function (e, pos) {
+				console.log(e, pos)
+				var i = bullets.length;
+				while (i--) {
+					bullets[i].className = ' ';
+				}
+				bullets[pos].className = 'on';
+			}
+		});
+	}
+</script>
+</div>
+</body>
+</html>
