@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>深入理解 HTML Canvas 第四章 动画</title>
+    <link rel="stylesheet" type="text/css" href="./toolkit/style/master.css">
+    <script src='toolkit/scripts/jquery.js'></script>
+    <script src='toolkit/scripts/setup.js'></script>
+    <script src='toolkit/scripts/jangle.js'></script>
+</head>
+
+<body>
+
+    <div id="header">
+        <h2>第四章</h2>
+        <h1>动画</h1>
+    </div>
+
+    <div id="content">
+        <h3>
+            <a id="settimeout">requestAnimationFrame 动画</a>
+        </h3>
+
+        <p>
+            现在我们知道如果绘制炫酷的东西，并且让它们动起来。
+            首先我们知道动画其实就是重复绘制相同的东西。
+            当调用绘制函数时，图像马上显示在画布上。
+            制作动画，等待某时刻又重新绘制。
+            当然不想等待忙碌的循环中阻塞浏览器。相反，你希望浏览器间隔某些事件通知重新你绘制图形。
+            最简单的方法就是使用计时器 setInterval() 函数。它会每间隔N毫秒调用一次。
+        </p>
+
+        <p>
+            然而，最好不要使用 setInterval。setInterval 会以相同的时间间隔执行绘制函数无论用户使用的是什么电脑，用户使用电脑期间做什么，
+            也不管页面是否正在后台运行。简单来说，能工作但效率不高。所以我们推荐使用一个新的接口 requestAnimationFrame。
+        </p>
+
+        <p>
+            requestAnimationFrame 是为了解决动画的流畅性及运行效率而提供的。
+            将绘制函数作为参数调用。以后，当浏览器就绪时，浏览器会调用绘制函数。这让浏览器完全控制图像的绘制，能减少能耗。
+            做出来的动画更加平滑，能以60帧/每秒左右的频率刷新。递归调用requestAnimationFrame。
+        </p>
+        <p>
+            requestAnimationFrame 正在成为一个标准，但大多浏览器现在只支持前缀版本（译者注：现在都已支持了，可以直接使用）。
+            例如，Chrome 浏览器使用 webkitRequestAnimationFrame 以及 Mozilla 支持 mozRequestAnimationFrame。
+            使用 shim 脚本兼容<a href='http://paulirish.com/2011/requestanimationframe-for-smart-animating/'>Paul Irish's shim script</a>.
+            shim 函数大致如下：
+            <code>requestAnimFrame</code>
+        </p>
+<pre><code>// shim layer with setTimeout fallback
+window.requestAnimFrame = (function(){
+    return  window.requestAnimationFrame       || 
+            window.webkitRequestAnimationFrame || 
+            window.mozRequestAnimationFrame    || 
+            window.oRequestAnimationFrame      || 
+            window.msRequestAnimationFrame     || 
+            function( callback ){
+            window.setTimeout(callback, 1000 / 60);
+            };
+})();</code></pre>
+
+        <p>
+            先来一个矩形运动的例子。
+        </p>
+
+<pre><code>var x = 0;
+function drawIt() {
+    window.requestAnimFrame(drawIt);
+    var canvas = document.getElementById('canvas');
+    var c = canvas.getContext('2d');
+    c.fillStyle = &quot;red&quot;;
+    c.fillRect(x,100,200,100);
+    x+=5;
+}
+window.requestAnimFrame(drawIt);
+</code></pre>
+
+        <div class='photo'>
+            <a class='examplelink noborder' href="examples/setinterval1.html">
+                <img src="examples/setinterval1.png" />
+            </a>
+            <p>
+                <b>交互</b> requestAnimFrame() 实例</p>
+            <p>
+                <i>
+                    使用 requestAnimFrame 的矩形运动（点击运行）
+                </i>
+            </p>
+        </div>
+
+        <h3>
+            <a id="clearbackground">清除背景</a>
+        </h3>
+
+        <p>
+            你会注意到一个问题。矩形跑出去屏幕了，每100毫秒（10FPS）更新5像素，原来的矩形还在。
+            看上去就是矩形变长了而已。需要注意的是 Canvas 只是一块像素的缓冲区。除非你作过改变否则设置过的像素一直保留。
+            所以在每一帧绘制矩形之前需要清除 canvas 画布。
+        </p>
+
+<pre><code>var x = 0;
+function drawIt() {
+    window.requestAnimFrame(drawIt);
+    var canvas = document.getElementById('canvas');
+    var c = canvas.getContext('2d');
+    <b>c.clearRect(0,0,canvas.width,canvas.height);</b>
+    c.fillStyle = "red";
+    c.fillRect(x,100,200,100);
+    x+=5;
+}
+
+window.requestAnimFrame(drawIt);</code></pre>
+
+        <div class='photo'>
+            <a class='examplelink noborder' href="examples/setinterval2.html">
+                <img src="examples/setinterval2.png" />
+            </a>
+            <p>
+                <b>交互</b> requestAnimFrame 实例</p>
+            <p>
+                <i>清除背景的绘制矩形 (点击运行)</i>
+            </p>
+        </div>
+
+        <h3>
+            <a id="particlesimulator">粒子模拟器</a>
+        </h3>
+
+        <p>
+            那就是制作动画的全部。重复一次又一次绘制图形。
+            我们尝试复杂一点的东西：一个粒子模拟器。
+            我们让一些粒子从画布上项雪花一样飘下。
+            为了实现粒子模拟器，我们会实现经典的粒子模拟器算法：
+        </p>
+
+        <div class='photo'>
+            <img src="images/particles.png" />
+        </div>
+
+        <p>
+            粒子模拟器包括一组需要循环的粒子。每一帧都会通过一些等式来更新每个粒子的位置，接着满足条件之后清除/创建粒子，
+            最后绘制粒子。
+            下面是一个简单的下雪粒子。
+        </p>
+
+<pre class='wrap'><code>var canvas = document.getElementById('canvas');
+var particles = [];
+var tick = 0;
+function loop() {
+    window.requestAnimFrame(loop);
+    createParticles();
+    updateParticles();
+    killParticles();
+    drawParticles();
+}
+window.requestAnimFrame(loop);</code></pre>
+
+        <p>
+            首先，我们先创建了一个粒子模拟器。
+            这个就是每隔 N 毫秒调用的 loop 函数。
+            我们需要的数据结构仅有一个空的粒子数组particles以及控制时间的tick计数器。
+            每次调用 loop 函数都会调用粒子模拟器的四部分功能。
+        </p>
+
+<pre class='wrap'><code>function createParticles() {
+    // 检查是否为10的倍数
+    if(tick % 10 == 0) {
+        // 少于100则新增粒子
+        if(particles.length &lt; 100) {
+            particles.push({
+                    x: Math.random()*canvas.width, // 0 ~ 画布宽度小数
+                    y: 0,
+                    speed: 2+Math.random()*3, // 2 ~ 5之间小数
+                    radius: 5+Math.random()*5, // 5 ~ 10 之间小数
+                    color: &quot;white&quot;,
+            });
+        }
+    }
+}</code></pre>
+
+        <p>
+            <code>createParticles</code> 创建粒子函数检查是否小于100个粒子，如果是则新创建一个粒子。
+            注意只有在 tick 计数器为 10 的倍数是才被创建。这样画布就减慢生成粒子，而不是开始的时候立刻就生成所有的100个粒子。
+            你可以根据效果需要调整该数值。
+            我用了<code>Math.random()</code> 随机数及一些计算让雪花出现在不同的位置，让它们看起来不全是一样的，让雪花看上去更自然。
+        </p>
+
+<pre><code>function updateParticles() {
+    for(var i in particles) {
+        var part = particles[i];
+        part.y += part.speed;
+    }
+}</code></pre>
+
+        <p>
+            <code>updateParticles</code> 更新粒子函数很简单。
+            它只更新每个粒子的y坐标，y坐标加上粒子本身的速度。这让雪花从画布上落下。
+        </p>
+<pre><code>function killParticles() {
+    for(var i in particles) {
+        var part = particles[i];
+        if(part.y &gt; canvas.height) {
+            part.y = 0;
+        }
+    }
+}</code></pre>
+        
+        <p>
+            上面的是清除粒子函数 <code>killParticles</code> 代码。
+            它检查每个粒子是否位于画布canvas的底部。
+            在一些模拟器中，会清除粒子并将其从粒子集合中移除。
+            为了让雪花持续地运动落下，我们通过设置该粒子的y坐标为0，回收该粒子。
+        </p>
+<pre><code>function drawParticles() {
+    var c = canvas.getContext('2d');
+    c.fillStyle = "black";
+    c.fillRect(0,0,canvas.width,canvas.height);
+    for(var i in particles) {
+        var part = particles[i];
+        c.beginPath();
+        c.arc(part.x,part.y, part.radius, 0, Math.PI*2);
+        c.closePath();
+        c.fillStyle = part.color;
+        c.fill();
+    }
+}</code></pre>
+
+        <p>
+            最后绘制所有的粒子。
+            这也很简单：首先清除背景，然后通过粒子提供的圆心（x,y）、 半径以及颜色绘制填充圆形。
+        </p>
+        <p>现在看起来应该是这样</p>
+
+        <div class='photo'>
+            <a class='examplelink noborder' href='examples/snowsim.html'>
+                <img src="examples/snowsim.png" />
+            </a>
+            <p>
+                <b>交互</b> 雪花模拟器</p>
+            <p>
+                <i>飘雪粒子模拟器。 (点击运行)</i>
+            </p>
+        </div>
+
+
+
+        <p>
+            我喜欢粒子模拟器的原因是使用简单的数学知识合着一点精心挑选的随机数就能够创建非常复杂、系统和看上去非常自然的动画
+        </p>
+
+        <h3>
+            <a id="spriteanimation">精灵图动画</a>
+        </h3>
+
+
+        <h4>什么是精灵图？</h4>
+
+        <p>
+            最后一类重要的动画就是精灵图动画。那么什么是精灵图动画？
+        </p>
+        
+        <p>
+            精灵图是能够快速绘制到画布上的小图片。通常精灵图都是从主图像扣出来的一部分。
+            扣下来的图片可能包含不同内容的多个片段，像游戏中的不同人物。精灵图或者包括相同人物的不同姿势。
+            这就是提供不同动画帧的原因。这就是经典动画的形式：快速翻转不同页面。
+        </p>
+        <h4>为什么和什么时候使用精灵图？</h4>
+
+        <p>精灵图有点：</p>
+
+        <ul>
+            <li>
+                第一，精灵图是栅格图像，一般比矢量图渲染快得多，尤其是复杂的矢量图。
+            </li>
+            <li>
+                第二，精灵图适合重复绘制相同的内容。例如，在太空战斗游戏中，你可能需要在画布中显示很多看上去一样的子弹。
+                一旦加载过一次子弹精灵图，之后就能重复绘制使用。
+            </li>
+            <li>
+                第三：精灵图能作为合成图片的一部分快速地下载并绘制。下载整合之后的单张精灵图比分开的一张张单独的图片下载快得多。
+                精灵图压缩得很好。最后，一张大图片比分散的多张图片使用的内存更少。
+            </li>
+            <li>
+                最后，制作动画的精灵图能通过其他诸如 Photoshop 的绘图工具制作出来。
+                代码只需要翻转图片而不需要担心图片上的是什么。
+                这就意味着你很容易就更新动画而无需修改代码。只需要替换精灵图即可。
+            </li>
+        </ul>
+
+        <h4>绘制精灵图</h4>
+
+        <p>Sprites are easy to draw using the
+            <code>drawImage</code> function. This function can draw and stretch a portion of an image 
+            by specifying different source
+            and destination coordinates. For example, suppose we have this sprite sheet and we just want to draw 
+            the sprite
+            in the center (5th from the left).</p>
+        <p>
+            精灵图很容易通过 <code>drawImage</code> 函数绘制。
+            该函数通过指定不同的源和目标坐标就能绘制和拉伸图像的一部分。
+            例如，假设我们有张精灵图，然后将该精灵图添加到画布中心（从左数第五张）。
+        </p>
+        <p class='photo'>
+            <img src="images/sprite.png" height="60" />
+        </p>
+
+        <p>
+            通过制定源坐标绘制单独的某帧图像。
+        </p>
+<pre class='wrap'><code>context.drawImage(
+    img,         // 精灵图
+    65,0,13,13, // 源坐标   (x,y,w,h)
+    0,0,13,13,  // 目标坐标 (x,y,w,h)
+);</code></pre>
+
+        <h4>精灵图动画</h4>
+
+        <p>
+            如上所见到整张精灵图，在动画不同帧中绘制相同的对象，现在切换不同的精灵图让它动起来。
+            我们会通过一个 tick 计数器保持动画帧执行。
+        </p>
+<pre class='wrap'><code>var frame = tick % 10; 
+var x = frame * 13;
+context.drawImage(
+    img,        //  精灵图
+    x,0,13,13,  // 源坐标      (x,y,w,h)
+    0,0,13,13,  // 目标坐标 (x,y,w,h)
+);
+tick++;</code></pre>
+
+        <p>
+            画布更新通过 tick 计算的当前所在帧。
+            通过模（%）操作10 意味着frame 重复地从0 ~ 9变化。
+            通过第几帧图片的下标计算出x的坐标。
+            接着绘制图片并更新tick计数器。
+            当然动画如果执行得太快，在模运算之前你可以用tick计数器除2或3减慢动画速度。
+
+        </p>
+        <div class='photo'>
+            <a class='examplelink noborder' href='examples/spriteanim.html'>
+                <img src="examples/spriteanim.png" />
+            </a>
+            <p>
+                <b>交互</b> 精灵图动画</p>
+            <p>
+                <i>
+                    动画有十帧，放大更多细节（点击运行）
+                </i>
+            </p>
+        </div>
+
+        <p>
+            下一章节中我们会创建一个简单的游戏。
+            这个游戏会演示如何使用基本的精灵动画，键盘事件以及爆炸的粒子效果。
+        </p>
+        <div id="footer">
+            <div class='chapnav bottom'>
+                <a class="prevchap" href="chapter03.html">上一章</a>
+                <a class="toclink" href="toc.html">目录</a>
+                <a class="nextchap" href="chapter05.html">下一章</a>
+            </div>
+        </div>
+    </div>
+
+    <div id='examplewrap'>
+        <iframe id='exampleframe' src=''></iframe>
+    </div>
+
+    <script type="text/javascript" class='bookscript'>
+        $(".examplelink").click(function (e) {
+            console.log("opening the big view " + this);
+            e.preventDefault();
+            $("#exampleframe").attr("src", $(this).attr("href"));
+            $("#examplewrap").show();
+        });
+
+        $("#examplewrap").hide();
+        $("#examplewrap").click(function (e) {
+            console.log("hiding");
+            e.preventDefault();
+            $("#exampleframe").attr("src", "");
+            $("#examplewrap").hide();
+            console.log("done hiding");
+        });
+    </script>
+</body>
+
+</html>

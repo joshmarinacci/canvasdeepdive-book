@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>深入理解 HTML Canvas 第三章 高级绘制及事件</title>
+    <link rel="stylesheet" type="text/css" href="./toolkit/style/master.css">
+    <script src='toolkit/scripts/jquery.js'></script>
+    <script src='toolkit/scripts/setup.js'></script>
+    <script src='toolkit/scripts/jangle.js'></script>
+</head>
+
+<body>
+
+    <div id="header">
+        <h2>第三章</h2>
+        <h1>高级绘制及事件</h1>
+    </div>
+
+    <div id="content">
+        <h3>
+            <a id="image_fills">图像填充</a>
+        </h3>
+        <p>
+            在<a href="chapter01.html">第一章中</a>，我们学习了 Canvas 能够使用颜色跟渐变填充路径，也能够使用图案（pattern）来填充路径。
+            能像CSS 中的背景图一样控制 Canvas 中的图案（pattern）的平铺方式。
+        </p>
+            跟渐变一样，图案的绘制也是相对当前的坐标系。
+            这就是我为什么在绘制第二个矩形的时候向右平移200像素。第二个矩形 X 方向不会平铺，Y 方向才会，
+            设置填充区域变大并不会绘制更多的图案。
+            <b>
+                拖拽下面的数值看看它是如何工作的。
+            </b>
+        </p>
+
+        <div id="imagefill" class='jangle'>
+            <canvas width="400" height="100"></canvas>
+            <pre></pre>
+            <div class='popup shadow'>000</div>
+        </div>
+        <script type="text/javascript" class='bookscript'>
+            $(document).ready(function () {
+                var img = new Image();
+
+                function drawit(ctx, var1, var2, var3, var4) {
+var pat1 = ctx.createPattern(img, 'repeat');
+ctx.fillStyle = pat1;
+ctx.fillRect(var1, 0, var2, 100);
+
+var pat2 = ctx.createPattern(img, 'repeat-y');
+ctx.fillStyle = pat2;
+ctx.translate(200, 0);
+ctx.fillRect(var3, 0, var4, 100);
+                }
+
+                img.onload = function () {
+                    console.log('image was loaded');
+                    var tangle = new Jangle();
+                    tangle.drawfun = drawit;
+                    tangle.vars = {
+                        var1: 0,
+                        var2: 100,
+                        var3: 0,
+                        var4: 100
+                    };
+                    tangle.setup("imagefill");
+                };
+
+                console.log('setting up the smile stuff ' + img);
+                img.src = './images/tile.png';
+            });
+        </script>
+
+        <p>
+            在canvas上绘制图像必须等到图片加载完毕，确保绘制图像代码放在图像的 <code>onload</code> 回调函数中。
+        </p>
+        <h3>
+            <a id="opacity">透明度</a>
+        </h3>
+
+        <p>
+            Canvas API 通过<code>globalAlpha</code>属性控制绘制函数的透明度。
+            下一个例子绘制了两个部分重叠的红色正方形，在绘制前改变了透明度。
+        </p>
+
+        <div id="opacitydemo" class='jangle'>
+            <canvas width="400" height="100"></canvas>
+            <pre></pre>
+            <div class='popup shadow'>000</div>
+        </div>
+        <script type="text/javascript" class='bookscript'>
+            $(document).ready(function () {
+
+                function drawit(ctx, var1, var2, var3, var4) {
+ctx.fillStyle = 'red';
+// 除100得到0~1之间的小数
+ctx.globalAlpha = var1 / 100;
+ctx.fillRect(0, 0, 50, 50);
+ctx.globalAlpha = var2 / 100;
+ctx.fillRect(25, 25, 50, 50);
+ctx.globalAlpha = 1.0;
+                }
+
+                var tangle = new Jangle();
+                tangle.drawfun = drawit;
+                tangle.vars = {
+                    var1: 50,
+                    var2: 30
+                };
+                tangle.setup("opacitydemo");
+
+            });
+        </script>
+
+        <p>
+            透明度的设置对所有的绘制操作都生效。
+            <b>
+                改变上面的透明度值观察变化影响。
+            </b>
+            当你完成操作后确保设置回1.0，不影响后续绘制操作。
+            <code>globalAlpha</code> 属性取值范围在0~1之间，其他值会忽略（在某些平台还会异常）。
+        </p>
+        <h3>
+            <a id="transforms">形变</a>
+        </h3>
+
+        <p>
+            在条形图章节中，我们通过设置不同的x，y坐标来绘制同样的矩形。
+            这次我们使用形变函数而不是修改坐标。
+            每次循环我们平移并增加100像素，移动条形到右边。
+        </p>
+
+        <div id="translatedemo" class='jangle'>
+            <canvas width="500" height="100"></canvas>
+            <pre></pre>
+            <div class='popup shadow'>000</div>
+        </div>
+        <script type="text/javascript" class='bookscript'>
+            $(document).ready(function () {
+
+                var data = [10, 20, 60, 5];
+
+                function drawit(ctx, var1, var2, var3, var4) {
+ctx.fillStyle = "red";
+for (var i = 0; i < data.length; i++) {
+    var dp = data[i];
+    ctx.translate(var1, 0);
+    ctx.fillRect(0, 0, 50, dp);
+}
+                }
+
+                var tangle = new Jangle();
+                tangle.drawfun = drawit;
+                tangle.vars = {
+                    var1: 100
+                };
+                tangle.setup("translatedemo");
+
+            });
+        </script>
+
+        <p>
+            <b>拖拽x平移量</b>观察对上面图表的影响。
+        </p>
+
+        <p>
+            与很多2D接口一样，Canvas 也支持标准的平移、旋转和缩放。
+            这次在屏幕上绘制矩形不需要手动计算新坐标。
+            Canvas 已经帮你计算了。
+            同样可以通过顺序调用来组合转换。
+            例如，绘制一个矩形，平移到中心，然后旋转30度：
+        </p>
+
+        <div id="rotatedemo" class='jangle'>
+            <canvas width="200" height="200"></canvas>
+            <pre></pre>
+            <div class='popup shadow'>000</div>
+        </div>
+        <script type="text/javascript" class='bookscript'>
+            $(document).ready(function () {
+
+                function drawit(ctx, x1, y1, rot1) {
+ctx.fillStyle = "red";
+ctx.translate(x1, y1);
+//convert degrees to radians
+var rads = rot1 * Math.PI * 2.0 / 360.0;
+ctx.rotate(rads)
+ctx.fillRect(0, 0, 100, 100);
+                }
+
+                var tangle = new Jangle();
+                tangle.drawfun = drawit;
+                tangle.vars = {
+                    x1: 50,
+                    y1: 50,
+                    rot1: 30
+                };
+                tangle.setup("rotatedemo");
+
+            });
+        </script>
+
+        <p>
+            每次调用平移、旋转或者缩放都相对与上一次的变换中。
+            变换多次之后就会混乱了。你可以像这样撤销变换：
+        </p>
+
+<pre><code>for(var i=0; i&lt;data.length; i++) {
+    <b>c.translate(40+i*100, 460-dp*4);</b>
+    var dp = data[i];
+    c.fillRect(0,0,50,dp*4);
+    <b>c.translate(-40-i*100, -460+dp*4);</b>
+}</code></pre>
+
+        <p>
+            但是这样就写了很多冗余代码。如果忘记撤销恢复一次，那你可能抓狂了并花费数个小时来排除问题（当然，我曾经试过）。
+            还好 Canvas 提供了一个状态保存的API。
+        </p>
+        <h3>
+            <a id="statesaving">状态保存</a>
+        </h3>
+
+        <p>
+            context2D 上下文对象代表了当前的绘制状态。
+            在本书中我经常使用 <code>ctx</code> 变量来表示该对象。状态包括当前的形变、填充和描边的颜色、当前的字体以及其他变量。
+            可以通过 <code>save()</code> 函数将状态保存到栈结构中。
+            当你保存状态之后，进行修改，然后使用 <code>restore()</code> 函数恢复之前的状态。
+            Canvas 认真地帮你做笔记。这个是通过状态保存修改过的之前的例子。注意的是我们没有撤销形变这步。
+        </p>
+        <pre><code>for(var i=0; i&lt;data.length; i++) {
+    c.save();
+    <b>c.translate(40+i*100, 460-dp*4);</b>
+    var dp = data[i];
+    c.fillRect(0,0,50,dp*4);
+    c.restore();
+}</code></pre>
+
+
+
+        <h3>
+            <a id="clipping">裁切</a>
+        </h3>
+        <p>
+            有时可能只需要绘制图像的一部分。那么可以使用 clip 函数。
+            它使用当前的路径作为之后绘制图像的蒙层。
+            这就意味着之后任何的图像绘制都只出现在裁切的形状里。
+            在蒙层之外的绘制的图像都不会显示在屏幕上。
+            当你想通过组合形状来创建一个复杂的图形或者由于某些原因需要更新画布上的某一部分这就相当有用。
+            以下的一个例子是：绘制了被三角形裁切掉了部分的长方形。
+        </p>
+
+        <div id="clippingdemo" class='jangle'>
+            <canvas width="400" height="200"></canvas>
+            <pre></pre>
+            <div class='popup shadow'>000</div>
+        </div>
+        <script type="text/javascript" class='bookscript'>
+            $(document).ready(function () {
+
+                function drawit(ctx, var1, var2, var3) {
+// 首先绘制矩形
+ctx.fillStyle = 'red';
+ctx.fillRect(0, 0, 400, 100);
+
+// 创建三角形路径
+ctx.beginPath();
+ctx.moveTo(200, var1);
+ctx.lineTo(250, 150);
+ctx.lineTo(150, 150);
+ctx.closePath();
+
+// 描边
+ctx.lineWidth = 10;
+ctx.stroke();
+
+// 上面三角形路径clip
+ctx.clip();
+// 使用黄色再次填充矩形
+ctx.fillStyle = 'yellow';
+ctx.fillRect(0, 0, 400, 100);
+                }
+
+                var tangle = new Jangle();
+                tangle.drawfun = drawit;
+                tangle.vars = {
+                    var1: 50
+                };
+                tangle.setup("clippingdemo");
+
+            });
+        </script>
+
+        <p>
+            注意黄色的矩形填充原来红色矩形得到的三角形。
+            同时注意三角形的下半部拥有较粗的边框，上部分拥有较细的边框。
+            因为三角形的边框是在正中心的。裁切的时候黄色路径覆盖了区域内的边框，区域外的没有覆盖。
+        </p>
+
+        <h3>
+            <a id="events">事件</a>
+        </h3>
+
+        <p>
+            Canvas 没有定义新事件。你能够在其他任何地方监听相同的鼠标以及触控事件。这有好有坏。
+        </p>
+
+        <p>
+            Canvas 画布看上去就是浏览器的一个矩形区域。
+            浏览器不知道画布上你绘制了什么。
+            在canvas画布上拖拽鼠标，浏览器返回标准的整个canvas元素的拖拽事件，而不是canvas画布里边绘制的某一部分。
+            这就意味着如果你需要绘制按钮或者作图工具，你不得不独自将浏览器提供的原始鼠标事件转换成个人数据模型。
+        </p>
+        <p>
+            计算当前鼠标所在Canvas的路径十分困难，还好 Canvas 提供了一个帮助性的 API：<code>isPointInPath</code>
+            该函数的功能是判断一个给定的坐标是否在当前路径中。以下是一个例子：
+        </p>
+        <pre><code>c.beginPath();
+c.arc(
+    100,100, 40,  // 圆心在（100,100）半径40像素的圆
+    0,Math.PI*2,  // 0 ~ 360 °的整圆
+);
+c.closePath();
+var a = c.isPointInPath(80,0);     // 返回 true
+var b = c.isPointInPath(200,100);  // 返回 false</code></pre>
+
+        <p>
+           另一个选项是使用三维类库，例如 <a href="https://github.com/joshmarinacci/aminojs" target="_blank">Amino</a>
+           让你使用路径而非像素工作。它为用户提供了事件处理程序及绘制。
+        </p>
+    </div>
+    <div id="footer">
+        <div class='chapnav bottom'>
+            <a class="prevchap" href="chapter02.html">上一章</a>
+            <a class="toclink" href="toc.html">目录</a>
+            <a class="nextchap" href="chapter04.html">下一章</a>
+        </div>
+    </div>
+</body>
+
+</html>
