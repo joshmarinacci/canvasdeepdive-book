@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>深入理解 HTML Canvas 第八章 移动设备与性能优化</title>
+    <link rel="stylesheet" type="text/css" href="./toolkit/style/master.css">
+    <script src='toolkit/scripts/jquery.js'></script>
+    <script src='toolkit/scripts/setup.js'></script>
+    <script src='toolkit/scripts/jangle.js'></script>
+</head>
+
+<body>
+    <div id="header">
+        <h2>第八章</h2>
+        <h1>移动设备与性能优化</h1>
+    </div>
+
+    <div id="content">
+        <p>
+            现在让我们来谈谈移动设备与性能优化。
+            不存在移动版本的canvas，有的仅是canvas。
+            桌面端跟移动端拥有相同的API接口。移动端的canvas有时缺失某些特定，因为移动端的canvas版本更低。同样也会出现在老旧的桌面端及浏览器中。
+            所有当你开发一个canvas app时，非常重要的是需要考虑使用不同的优化代码的方式优化性能。
+        </p>
+        <h3>
+            <a id="drawless">Draw Less</a>
+        </h3>
+
+        <p>性能优化的金句：
+            <i>draw less</i>
+        </p>
+        <p>
+            <b>不要绘制隐藏的东西</b>。
+            如果你有四张画面信息但每次只显示其中一张，那么其他三张不要绘制。 </p>
+        <p>
+            <b>使用图像代替路径</b>。如果有些图形从来不会改变或者缩放，那么考虑使用像PS的绘图软件预先绘制到图片里。
+            一般来说，位图的绘制要比矢量图的绘制快得多。尤其是在游戏中像精灵图一样重复绘制的图形。
+        </p>
+        <p>
+            <b>使用多个隐藏的canvas作为缓存</b>。
+            运行时创建一些屏幕不可见的 canvas 对象实例。这样就能将不可见的 canvas 作为缓存。
+            当你的 app 开始运行时，将图形绘制到不可见的 canvas 画布中，接着就可以重复的使用。
+            这跟使用图像获得一样的速度。
+        <p>
+            <b>图像拉伸</b>。
+            既然我们已经使用图像绘制了很多东西，那么可以拉伸图像得到更多的效果。
+            很多 canvas 接口都对缩放、裁切图像有良好的优化，所以处理运行得相当快。
+            <code>drawImage</code>有几种绘制图像的接口因此可以只绘制部分图像。使用这些 API 能够创作炫酷的东西，例如将多张精灵图
+            绘制到一张单一图像中，或者拉伸图像获取特定效果。
+        <p>
+            <b>只重绘画面需要变化的部分</b>。
+            依据 app 的需求，可能只需要重绘部分内容。例如，一只皮球在弹跳，那么就不需要绘制整个画布背景。
+            相反，只需要重绘当前皮球的位置以及上一帧所在的位置。对于一些app来说，这会有一个巨大的性能速度的提升。
+        <p>
+            <b>绘制更少的帧数</b>。能够绘制少的帧数就尽可能的少绘制帧数。
+            为了得到更平滑的动画你可能想绘制100帧每秒，但是大多数计算机的刷新速率最大帧数是60FPS。
+            实在是没有必要绘制更多的帧数因为用户也看不见。那么该如何同步屏幕的刷新速率？
+            Mozilla 和 WebKit 都有实验性质的api当屏幕刷新的时候调用代码。这会代替你使用setInterval或者setTimeout代码的调用。
+            浏览器负责提供一个温度的速率，这会保证你不需要高于60FPS的刷新速率。这也会自动处理一些当用户切换页面时减少帧数的事情。
+            移动浏览器同样也会做同样的处理，所以当app后台运行时，会减少电池的使用。
+        <p>
+            <b>绘制最少的方法是不绘制它</b>。
+            如果有一个静态的背景那么将它移出canvas中，在浏览器中当做图片使用。将canvas背景设置成透明那么就能看到canvas在css中设置的背景图片。
+            如果你需要移动大的图片，你会发现使用CSS过渡比在canvas中使用Javascript的速度快以及流畅得多。
+            通常CSS过渡会快的原因是因为它们是用C语言实现而不是JS，当然应情况而异，需要测试再测试。
+            说到这：Chrome 以及火狐浏览器都提供了相对优秀的工具帮助调试你的Javascript。
+        <p>
+            <b>对齐图像的像素</b>。最后一点提示，在一些实现中，如果绘制像素边界，图像和图形将绘制得更快。在某些测试中，精灵图对齐像素，在ipad设备中的canvas会有2到3倍的速度提升。
+        </p>
+
+    </div>
+</body>
+
+</html>
