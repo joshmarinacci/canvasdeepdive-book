@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>深入理解 HTML Canvas 第十二章 使用 getUserMedia() 获取摄像头</title>
+    <link rel="stylesheet" type="text/css" href="./toolkit/style/master.css">
+    <script src='toolkit/scripts/jquery.js'></script>
+    <script src='toolkit/scripts/setup.js'></script>
+    <script src='toolkit/scripts/jangle.js'></script>
+</head>
+
+<body>
+    <div id="header">
+        <h2>第十二章</h2>
+        <h1>使用 getUserMedia() 获取摄像头</h1>
+    </div>
+
+    <div id="content">
+        <h3>
+            <a id='overview'>获取用户媒体getUserMedia</a>
+        </h3>
+        <p>
+            一直以来在Web上与本地资源交互的唯一方法是上传文件。
+            你唯一能与之互动的本地设备是鼠标和键盘。幸运的是，情况不再如此。
+            在上一章中我们看到了如何操作音频。在本章中，我们将讨论用户的网络摄像头。
+        </p>
+        <p>
+            首先，我要强调的是，这都是高度实验性质的。
+            与本地设备对话的API已经改变了很多次，在它们成为标准之前可能会再次改变。
+            此外，只有桌面Chrome和Opera真正的支持来访问网络摄像头[火狐？旅行了吗？]。实际上没有移动支持。
+            使用本章作为一种方法，看看未来会发生什么，并在周围玩得很开心，但绝对不要在任何生产代码中使用它。也就是说，让我们玩得开心点！
+        </p>
+        <p>
+            从网页中访问本地设备有一个漫长而曲折的历史。
+            过去只有本地插件如Flash和java。如今这种情况在过去的几年已经发生了很大的变化。
+            <a href="http://www.webrtc.org/">WebRTC</a>团队的目标是通过网页实现实时通信网络。
+            想想视频聊天和现场直播的音乐会。要使这一愿景真正实现需要的一个组件是访问网络摄像头。
+            如今使用<code>navigator.getUserMedia()</code>就能够做到。
+        </p>
+
+        <p> I'm going to show you method that works in the latest Chrome beta (v21 as of July 13th, 2012). 
+            For a more robust
+            solution see
+            <a href="http://www.html5rocks.com/en/tutorials/getusermedia/intro/">this article on HTML 5 Rocks</a>. 
+            Also note that
+            <code>getUserMedia</code> will not work from the local filesystem. You must run it through a local webserver.</p>
+        <p>
+            为了更健壮的解决方案，可以参考<a href="http://www.html5rocks.com/en/tutorials/getusermedia/intro/">HTML 5 Rocks 上的这篇文章</a>。
+            注意<code>getUserMedia</code>不能在本地直接运行，需要通过本地服务器运行。
+        </p>
+        <p>
+            首先我们需要一个video元素。以下是webcam的展示：
+        </p>
+        <pre><code>&lt;video autoplay&gt;&lt;/video&gt;</code></pre>
+
+        <p>
+            访问<code>webcam</code>，必须先看看浏览器是否存在该属性，代码<code>navigator.webkitGetUserMedia != null</code>。
+            如果存在就会发起请求访问。<code>options</code>对象决定是否需要audio，video或者两者。
+            上面在Chrome浏览器中，只有audio无效。
+        </p>
+<pre><code>if(navigator.webkitGetUserMedia!=null) {
+var options = {
+    video:true,
+    audio:true
+};
+
+// 请求webcam调用权限
+navigator.webkitGetUserMedia(options,
+    function(stream) {
+        // 获取video标签
+        var video = document.querySelector('video');
+        // 将stream转换成URL
+        video.src = window.webkitURL.createObjectURL(stream);
+    },
+    function(e) {
+        console.log("error happened");
+    }
+);
+}</code></pre>
+
+        <p>
+            当<code>webkitGetUserMedia</code>调用时，出现对话框询问用户授权是否允许使用该设置。
+            如果用户同意之后，第一个函数就会被调用，否则第二个函数被调用。
+        </p>
+        <p>
+            现在我们获取到了stream，把stream通过方法<code>webkitURL.createObjectURL()</code>生成的URL赋值到video元素的src上。
+            一旦连接起来，vedio元素将显示摄像头的实时视图。
+        </p>
+        <p>现在看起来这样：</p>
+
+        <div class="photo">
+            <img src="images/simplewebcam.png" />
+            <p>
+                <b>获取快照</b>简易 webcam</p>
+        </div>
+
+        <h3>
+            <a id='snapshot'>获取快照</a>
+        </h3>
+        <p>
+            现在我们得到了实时摄像头的视频流，可以利用这做些什么呢？
+            碰巧，视频元素与画布搭配得很好。我们可以通过把它获取图像快照并绘制进2D画布中，看起来这样：
+        </p>
+<pre><code>&lt;form&gt;&lt;input type='button' id='snapshot' value=&quot;snapshot&quot;/&gt;&lt;/form&gt;
+&lt;canvas id='canvas' width='100' height='100'&gt;&lt;/canvas&gt;
+&lt;script language='javascript'&gt;
+document.getElementById('snapshot').onclick = function() {
+    var video = document.querySelector('video');
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(video,0,0);
+}
+&lt;/script&gt;</code></pre>
+        <p>
+            点击按钮时，它的事件处理程序抓取的页面的视频快照并绘制到画布上。我们调用同样的drawimage()函数，会看到一张静态图像。
+            因为它是同一个函数，我们可以用同样的方法来处理它。可以改变DrawImage调用看起来像这样：
+        </p>
+<pre><code>// 视频源的尺寸为100*100
+ctx.drawImage(video,0,0,100,100);</code></pre>
+
+        <div class="photo">
+            <img src="images/stretchwebcam.png" />
+            <p>
+                <b>快照</b>伸缩快照</p>
+            <p>
+                <i>实时webcam中的快照，通过Cavnas 2d进行拉伸</i>
+            </p>
+        </div>
+        <p>
+            这就是所有的了。webcam仅仅就是一张图像。
+            我们可以使用像素缓冲区中的章节提到的一些效果来修改它。下面的代码将快照反色处理。
+        </p>
+
+<pre><code>var video = document.querySelector('video');
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+ctx.drawImage(video,0,0);
+// 获取画布数据
+var data = ctx.getImageData(0,0,canvas.width,canvas.height); 
+// 转换每一个像素 
+for(n=0; n&lt;data.width*data.height; n++) { 
+    var index = n*4;  
+    data.data[index+0] = 255-data.data[index+0]; 
+    data.data[index+1] = 255-data.data[index+1]; 
+    data.data[index+2] = 255-data.data[index+2]; 
+    // 不要改变alpha透明值
+} 
+    
+// 将处理后的数据回置到画布上 
+ctx.putImageData(data,0,0); </code></pre>
+
+
+        <div class="photo">
+            <img src="images/invertwebcam.png" />
+            <p>
+                <b>快照</b>反色</p>
+            <p>
+                <i>实时webcam中的快照，通过像素处理进行反转</i>
+            </p>
+        </div>
+
+        <p>
+            你可以通过反复捕获视频而不是用户按下按钮的方式来实现这个功能。
+        </p>
+
+        <h3>
+            <a id='examples'>更多酷应用</a>
+        </h3>
+
+        <p>
+            我所展示的只是冰山一角。这里还有一些案例都是一些有才能的开发者所创造的。
+        </p>
+
+        <p>
+            Neave.com 网站的摄像头进行了一些实时的像素效果处理，类似于Instagram的过滤器。
+        </p>
+
+        <div class="photo">
+            <img src="images/webcamtoy.png" />
+            <p>
+                <b>link</b>
+                <a href="http://neave.com/webcam/html5/">Neave.com Webcam Toy.</a>
+            </p>
+            <p>
+                <i>使用效果的 A webcam toy</i>
+            </p>
+        </div>
+        <p>
+            Soundstep.com 创建了一个木琴，这木琴可以在摄像头移动手臂来控制。
+            注意运动检测器在右下角。
+        </p>
+        <div class="photo">
+            <img src="images/musicwebcam.png" />
+            <p>
+                <b>链接</b>
+                <a href="http://www.soundstep.com/blog/experiments/jsdetection/">Soundstep's 摄像头木琴</a>
+            </p>
+            <p>
+                <i>移动手臂控制的木琴</i>
+            </p>
+        </div>
+        <p>
+            麦克风还不管用。你不能把它连接到网络音频的方面，但希望很快。
+            有针对chromium的归档漏洞来实现这一目标。希望到今年年底，特别是因为它是需要真正让WebRTC工作。
+        </p>
+    </div>
+    <div id="footer">
+        <div class="chapnav bottom">
+            <a class="prevchap" href="chapter11.html">上一章</a>
+            <a class="toclink" href="toc.html">目录</a>
+            <a class="nextchap" href="chapter_end.html">下一章</a>
+        </div>
+    </div>
+</body>
+
+</html>

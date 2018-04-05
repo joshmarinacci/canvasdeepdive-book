@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>深入理解 HTML Canvas 第二章 动手：制作图表 案例</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <script>
+        var data = [ 16, 68, 20, 30, 54 ]
+
+        // 获取canvas元素
+        var canvas = document.getElementById('canvas')
+        // 获取canvas 绘图上下文
+        var c = canvas.getContext('2d')
+
+        // 绘制
+        c.fillStyle = 'white'
+        c.fillRect(0, 0, 500, 500)
+
+        // 添加数据
+        c.fillStyle = 'blue'
+        for (var i = 0; i < data.length; i++) {
+            var dp = data[i]
+            c.fillRect(36 + i * 100, 460 - dp*5, 50, dp * 5)
+        }
+
+        // 添加轴线
+        c.fillStyle = 'black'
+        c.lineWidth = 2.0
+        c.beginPath()
+        c.moveTo(30, 10)
+        c.lineTo(30, 460)
+        c.lineTo(490, 460)
+        c.stroke()
+
+        // 绘制文本及短线
+        c.fillStyle = 'black'
+        for (var i = 0; i < 6; i++) {
+            c.fillText((5 - i) * 20 + '', 4, i * 80 + 60)
+            c.beginPath()
+            c.moveTo(25, i * 80 + 60)
+            c.lineTo(30, i * 80 + 60)
+            c.stroke()
+        }
+
+        var labels = ['JAN', 'FEB', 'MAR', 'APR', 'MAY']
+        // 绘制水平文本
+        for (var i = 0; i < 5; i++) {
+            c.fillText(labels[i], 50 + i * 100, 475)
+        }
+    </script>
+</body>
+</html>

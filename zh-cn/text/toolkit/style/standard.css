@@ -1,0 +1,298 @@
+/* ========= fonts =========== */
+
+
+@font-face {
+    font-family: "Gothic";
+    src: url("../fonts/League_Gothic-webfont.woff");
+}
+@font-face {
+	font-family: "Goudy";
+	src: url("../fonts/GoudyStM-webfont.woff");
+}
+@font-face {
+	font-family: "Goudy";
+	font-style: italic;
+	src: url("../fonts/GoudyStM-Italic-webfont.woff");
+}
+
+#content {
+	font-size: 14pt;
+	font-family: 'Crimson', Georgia, Times, serif;
+}
+p {
+	line-height: 140%;
+}
+h1,h2,h3 {
+    font-size: 300%;
+    word-spacing: 3px;
+    text-transform: none;
+    font-family: Gothic, Helvetica, Verdana, Arial, sans-serif;
+}
+h2 {
+	color: #ff2b0d;
+	font-style: normal;
+	font-weight: normal;
+	text-transform: uppercase;
+	font-size: 130%;
+}
+h3 {
+	font-size: 150%;
+}
+
+#toc a {
+	position: relative;
+	color: #333;
+	text-decoration: none;
+	padding: 2px;
+}
+
+#toc a:after, #toc a:before {
+	content: "";
+	position: absolute;
+	bottom: 1px;
+	background-color: #333;
+	height: 1px;
+	width: 0;
+	transition: width 0.2s;
+}
+#toc a:before {
+	left: 0;
+	top: 1px;
+}
+#toc a:after {
+	right: 0;
+}
+#toc a:hover:after, #toc a:hover:before {
+	width: 100%;
+}
+
+/* ============ colors and backgrounds ============ */
+/*
+#book_content {
+	background-color: white;
+	background-image: url(../images/graytexture.png);
+}
+*/
+#header {
+	/*background-image: url(../images/bluenoise.png);*/
+	background-color: #00ebe7;
+	background-position: 100% 100%;
+	background-repeat: repeat;	
+}
+#header h1 { color: white; text-shadow: 3px -3px 0px black; }
+#header h2 { color: black; }
+
+/*  ==========  basic structure  =========  */
+
+body {
+    margin: 0;
+    padding: 0;
+}
+#book_content, #content, .chapnav {
+    border: 0px solid red;
+    margin:0;
+    padding:0;
+}
+
+
+#content, .chapnav {
+	margin:  0;
+	padding: 0;
+	border: 0px solid red;
+	margin-left:  auto;
+	margin-right: auto;
+}
+
+#header {
+    border: 1px solid #06e6e3;
+    padding: 0;
+    margin:  0;
+}
+
+#header * {
+	margin-left: auto;
+	margin-right: auto;
+	border: 0px solid red;
+}
+
+#content, #header *, .chapnav {
+	max-width: 600px;
+}
+
+
+#header h1 { font-size:  300%; }
+#header h2 { padding-top: 1em; }
+
+
+/* debugging */
+/*
+#content, #header, #header * { border: 3px solid purple; }
+*/
+
+
+/* ============= GENERAL CONTENT STYLES ============== */
+
+
+/* ==== links ==== */
+
+a.noborder {
+    border-width: 0;
+}
+#content h3 a {
+	border-width: 0;
+}
+
+
+/*  ==========  inline code  =========  */
+
+canvas {
+	border: 1px solid #e1dedb;
+	overflow: auto;
+	border-radius: 3px;	
+}
+pre {
+	padding: 16px;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
+	background-color: #f6f8fa;
+	border: 1px solid #e1dedb;
+	border-radius: 3px;
+	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"
+}
+pre code {
+	display: inline;
+    max-width: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    line-height: inherit;
+    word-wrap: normal;
+    background-color: transparent;
+	border: 0;
+	font-family: inherit;
+}
+pre span {
+	display:block;
+	white-space: pre-wrap;
+	padding-left: 2em;
+	text-indent: -2em;
+	/* background-image: url(../images/code_wrap.png); */
+	background-repeat: no-repeat;
+	background-position: left top;
+	line-height: 16px;
+	font-size: 75%;
+	border: 0px solid red;
+}
+
+
+
+/* ========== tables =========== */
+
+table {
+	font-family: Helvetica, Verdana, Arial, sans-serif;
+	border-collapse: collapse;
+	border: 1px solid gray;
+	
+}
+td, th {
+	padding-left: 0.5em;
+	padding-bottom: 0.3em;
+	padding-right: 0.5em;
+	padding-top: 0.3em;
+	border: 1px solid gray;
+}
+
+th {
+	font-style: normal;
+	font-weight: normal;
+	color: white;
+	background-color: #9f9f9f;
+}
+
+
+
+
+/* === glossary notes ==== */
+
+
+.glossary {
+	padding-right: 0.4em;
+	padding-left: 0.4em;
+	border-color: #c2c2c2;
+	border-style: none;
+	border-width: 1px;
+	background-color: #ededed;
+	color: #3d393b;
+	border-radius: 1em;
+}
+
+#glossary_popup {
+	position: fixed;
+	top: 0;
+	left: 0;
+	border: 2px solid #000000;
+	border-radius: 0.5em;
+	background-color: #fefffe;
+	width: 15em;
+	padding: 0.5em;
+	margin: 0;
+	background-color: rgba(255,255,255,0.95);
+}
+#glossary_popup h4 {
+	padding: 0; margin: 0;
+	font-family: Helvetica;
+	text-align: center;
+}
+#glossary_popup p {
+	padding: 0; margin: 0;
+}
+
+#book_content.fontsmall  { font-size: 10pt; }
+#book_content.fontmedium { font-size: 13pt; }
+#book_content.fontlarge  { font-size: 16pt; }
+
+
+
+#toc {
+    padding-left:0;
+    margin-left:0;
+}
+#toc li {
+	padding: 0.3em;
+    list-style: none;
+}
+
+#header, #footer {
+	position: relative;
+}
+
+#footer {
+	margin: 5em 0;
+}
+
+#header .chapnav {
+	position: absolute;
+	z-index: 1;	
+}
+
+.chapnav {
+    padding: 0.5em;
+    padding-top: 0;
+    border: 0px solid black;
+    left: 0;
+	right: 0;
+	top: 20px;
+    font-size: 18px;
+    font-weight: normal;
+    text-transform: none;
+    font-family: Gothic, Helvetica, Verdana, Arial, sans-serif;
+    text-align: center; 
+}
+.chapnav a {
+	float: left;
+	width: 33.3%;
+	border: none;
+    text-decoration: underline;
+    text-align: center;
+}

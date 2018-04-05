@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>深入理解 HTML Canvas 第十章 使用 ThreeJS 动手制作 WebGL: 3D Car</title>
+    <link rel="stylesheet" type="text/css" href="./toolkit/style/master.css">
+    <script src='toolkit/scripts/jquery.js'></script>
+    <script src='toolkit/scripts/setup.js'></script>
+    <script src='toolkit/scripts/jangle.js'></script>
+</head>
+
+<body>
+    <div id="header">
+        <h2>第十章</h2>
+        <h1>使用 ThreeJS 动手制作 WebGL: 3D Car</h1>
+    </div>
+    <div id="content">
+        <h3>
+            <a id='cube'>创建天空</a>
+        </h3>
+        <p>
+            我们会手把手创建一个新的场景：一辆小车在繁星满天的大草原上行驶。
+            这个是改编自 Jerome 的博客文章，他同时创建了模型构造器和供ThreeJS使用的tQuery。
+            （<a href="http://learningthreejs.com/blog/2012/05/21/sport-car-in-webgl/">原始系列</a>）。
+        </p>
+        <p>
+            以新模板<a href="http://jeromeetienne.github.com/threejsboilerplatebuilder/">the template builder</a>开始。
+            现在添加一个大的立方体的一面，技巧是将地球的部分放进立方体里。
+            我们从加载图片进单个立方体纹理开始：
+        </p>
+<pre><code>// 添加天空地图
+// 加载天空图片
+var urls = [
+    "images/sky1.png",
+    "images/sky1.png",
+    "images/sky1.png",
+    "images/sky1.png",
+    "images/sky1.png",
+    "images/sky1.png",
+];
+var textureCube = THREE.ImageUtils.loadTextureCube(urls);</code></pre>
+
+        <p>图片
+            <code>sky1.png</code> 包含在下载的实例中。</p>
+        <p>
+            现在使用立方体着色器标准方式（uniforms）绘制它。注意我们已经使用<code>tCube</code>作为纹理。
+        </p>
+
+<pre><code>// 设置立方体着色器
+var shader = THREE.ShaderUtils.lib["cube"];
+var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
+uniforms['tCube'].texture = textureCube;
+var material = new THREE.ShaderMaterial({
+        fragmentShader : shader.fragmentShader,
+        vertexShader   : shader.vertexShader,
+        uniforms       : uniforms
+});
+</code></pre>
+
+        <p>
+            现在，需要一个立方几何体，并设置尺寸为<code>10000</code>。这个立方体足够大。然后将其添加到场景中。
+            接着设置<code>flipSided</code>为true，原因是默认的立方体的纹理在外部。在我们的例子中需要，里边立方体的纹理。
+        </p>
+<pre><code>// 创建skybox
+var size = 10000;
+skyboxMesh = new THREE.Mesh( 
+    new THREE.CubeGeometry(size,size,size),material);
+//重要!! 使用内部的替换外部
+skyboxMesh.flipSided = true; // 必须设置，否则无法显示
+scene.add(skyboxMesh);
+</code></pre>
+
+        <p>
+            然后设置灯光。没有光一切都看不见。
+        </p>
+<pre><code>//添加灯光
+var light = new THREE.SpotLight();
+light.position.set(0,500,0);
+scene.add(light);</code></pre>
+
+        <p>目前为止看到的：</p>
+
+        <p>
+            <img src="images/gl_sky.png">
+        </p>
+
+        <h3>
+            <a id='ground'>制作地平面</a>
+        </h3>
+
+        <p>
+            现在需要一地平面。首先下载草坪图像（<a href='http://www.tutorialsforblender3d.com/Textures/Grass/Grass_1.html'>元素图像</a>）作为纹理。
+            （草坪图像同样亦在下载的代码中。）设置水平跟竖直方向上的平铺。
+            平铺值一般与纹理的尺寸同等大小，或者是其的2倍。
+        </p>
+
+<pre><code>// 添加地平面
+var grassTex = THREE.ImageUtils.loadTexture('images/grass.png');
+grassTex.wrapS = THREE.RepeatWrapping;
+grassTex.wrapT = THREE.RepeatWrapping;
+grassTex.repeat.x = 256;
+grassTex.repeat.y = 256;
+var groundMat = new THREE.MeshBasicMaterial({map:grassTex});</code></pre>
+
+        <p>
+            接下来是几何体。就是空间中的一个平面。平面的大小是400*400，相比相机来说够大了，但对于10000的天空就小得多了。
+        </p>
+        <pre><code>var groundGeo = new THREE.PlaneGeometry(400,400);</code></pre>
+
+        <p>
+            接着合并到同一个网格中。
+            设置<code>position.y</code>为-1.9那么它就位于环状下面。
+            设置<code>position.x</code>为90度，地面就是水平的（平面默认是竖直的。）
+            如果不生效，地平面尝试设置<code>doubleSided</code>为true。平面默认只绘制一面。
+        </p>
+
+<pre><code>var ground = new THREE.Mesh(groundGeo,groundMat);
+ground.position.y = -1.9; //lower it
+ground.rotation.x = -Math.PI/2; //-90 degrees around the xaxis
+// 重要, 两面都绘制
+ground.doubleSided = true;
+scene.add(ground);</code></pre>
+
+        <p>现在看起来的样子：</p>
+
+        <p>
+            <img src='images/gl_grass.png' />
+        </p>
+
+        <h3>
+            <a id='car'>添加车模型</a>
+        </h3>
+        <p>
+            另外加载车模型替换环状。
+            下面的案例中，<a href='http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129'>Troyano
+            </a>创建的布加迪威龙跑车的模型十分详细。
+            从这里<a href='https://github.com/mrdoob/three.js/tree/master/examples'>ThreeJS examples repo
+            </a>可以得到。从下载的代码中可以找到。模型是二进制格式而非JSON，加载二进制使用<code>THREE.BinaryLoader</code>加载器。
+        </p>
+<pre><code>// 加载小车		
+//重要: 确保路径使用"./"能够正确加载 .bin 文件
+new THREE.BinaryLoader().load('./VeyronNoUv_bin.js', function(geometry) {
+    var orange    = new THREE.MeshLambertMaterial( { color: 0x995500, opacity: 1.0, transparent: false } );
+    var mesh	= new THREE.Mesh( geometry, orange );
+    mesh.scale.x = mesh.scale.y = mesh.scale.z = 0.05;
+    scene.add( mesh );
+    car = mesh;
+});</code></pre>
+
+        <p>
+           注意材质是<code>MeshLambertMaterial</code>而不是之前所使用的<code>MeshNormalMaterial</code>。
+           这种材质根据灯光（橙色，本案例中）给小车添加了一个良好的厚实颜色。
+           这小车网格模型默认比环状要大得多，所以缩小到5%并添加到场景中。
+        </p>
+        <p>现在看起来这样：</p>
+
+        <p>
+            <img src='images/gl_car.png'>
+        </p>
+
+        <h3>
+            <a id='keyboard'>键盘控制</a>
+        </h3>
+        <p>
+            当然，车只是呆在那里，一点乐趣也没有。离我们也太远了。所以我们让车动起来。
+            当前<code>cameraControl</code>对象移动相机。移除之前初始化的<code>cameraControl</code>对象，并创建一个<code>KeyboardState</code>对象。
+            需要在页面顶部引入：<code>vendor/threex/THREEx.KeyboardState.js</code> 
+        </p>
+<pre><code>&lt;script src=&quot;vendor/threex/THREEx.KeyboardState.js&quot;&gt;&lt;/script&gt;</code></pre>
+
+<pre><code>// 创建相机控制
+//cameraControls	= new THREEx.DragPanControls(camera)
+keyboard = new THREEx.KeyboardState();</code></pre>
+
+        <p>Now, go down to the
+            <code>render()</code> function. The keyboard object will let us query the current state of the keyboard.
+             To move the
+            car around using the keyboard replace
+            <code>cameraControls.update()</code> with this code:</p>
+        <p>
+            接着，向下找到<code>render()</code>函数。
+            <code>keyboard</code>对象让我们知道键盘的当前状态。
+            使用对象<code>keyboard</code>移动小车并使用以下代码替换 <code>cameraControls.update()</code>：
+        </p>
+<pre><code>// 更新相机控制
+//cameraControls.update();
+if(keyboard.pressed("left")) {
+    car.rotation.y += 0.1;
+}
+if(keyboard.pressed("right")) {
+    car.rotation.y -= 0.1;
+}
+if(keyboard.pressed("up")) {
+    car.position.z -= 1.0;
+}
+if(keyboard.pressed("down")) {
+    car.position.z += 1.0;
+}</code></pre>
+
+        <p>
+            现在能够使用键盘来开车了。
+            当然，这看上去并不十分真实。汽车可以侧着滑行。为了解决这个问题，我们需要一个向量来表示汽车的当前方向。
+            添加一个<code>angle</code>变量并修改代码，看起来这样：
+        </p>
+<pre><code>if(keyboard.pressed("left")) {
+    car.rotation.y += 0.1;
+    angle += 0.1;
+}
+if(keyboard.pressed("right")) {
+    car.rotation.y -= 0.1;
+    angle -= 0.1;
+}
+if(keyboard.pressed("up")) {
+    car.position.z -= Math.sin(-angle);
+    car.position.x -= Math.cos(-angle);
+}
+if(keyboard.pressed("down")) {
+    car.position.z += Math.sin(-angle);
+    car.position.x += Math.cos(-angle);
+}</code></pre>
+
+
+        <h3>
+            <a id='next'>下一步</a>
+        </h3>
+
+        <p>
+            这就是手把手的代码。如果你希望继续完成这个案例，以下是一些能够增加的。
+        </p>
+        <ul>
+            <li>
+                相机跟随小车。
+            </li>
+            <li>
+                让小车发光。可以查看案例中的源代码。
+            </li>
+            <li>
+                小车到达世界边缘时停下。
+            </li>
+            <li>
+                将之前章节中的点屏幕效果添加到场景中。
+            </li>
+        </ul>
+
+        <p>查看最终版本
+            <a href='../canvasdeepdive-examples/WebGL/car.html'>这里</a>。
+        </p>
+
+        <p>
+            <a href='http://mrdoob.github.com/three.js/docs/'>ThreeJS 文档</a>
+        </p>
+
+    </div>
+    <div id="footer">
+        <div class="chapnav bottom">
+            <a class="prevchap" href="chapter09.html">上一章</a>
+            <a class="toclink" href="toc.html">目录</a>
+            <a class="nextchap" href="chapter11.html">下一章</a>
+        </div>
+    </div>
+</body>
+
+</html>

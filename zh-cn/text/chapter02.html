@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>深入理解 HTML Canvas 第二章 动手：制作图表</title>
+    <link rel="stylesheet" type="text/css" href="./toolkit/style/master.css">
+	<script src='toolkit/scripts/jquery.js'></script>
+    <script src='toolkit/scripts/setup.js'></script>
+    <script src='toolkit/scripts/jangle.js'></script>
+</head>
+
+<body>
+    <div id="header">
+        <h2>第二章</h2>
+        <h1>动手: 制作图表</h1>
+    </div>
+
+
+    <div id="content">
+        <p class="note">
+            该章节程序源代码以及该书中的所有程序，都能在<a href='http://joshondesign.com/canvasbook/'>该处</a>找到。
+        </p>
+        <p class="note">
+            需要注意的是该章节的代码案例是直接从硬盘读取本地运行，而非从web服务器获取。
+            所以在开发过程中，需要禁止Chrome的安全性问题。
+            如果在加载图像或其他文件过程中，出现问题，尝试在命令行中添加安全标识。
+        </p>
+        <p>在 Mac OS X 系统中</p>
+
+        <pre class='wrap'>
+<code>/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome 
+--allow-file-access-from-files --disable-web-security</code></pre>
+
+        <p>Linux 系统</p>
+        <pre class='wrap'><code>chromium-browser --disable-web-security</code></pre>
+
+        <p>Windows 系统</p>
+        <pre class='wrap'><code>chrome.exe --disable-web-security</code></pre>
+
+        <p>另外，你也可以通过本地服务器来加载页面。</p>
+        <p>
+            在本章节中，会对数据处理成自定义图表。
+            你会学到线、形状及文本的基本绘制。之后再制作渐变的饼图。
+        </p>
+        <h3>
+            <a id="new_page">创建新页面</a>
+        </h3>
+
+        <p>
+            开始新建 <code>barchart.html</code>文件，内容如下：
+        </p>
+<pre class='wrap'>
+<code>&lt;html&gt;
+&lt;body&gt;
+&lt;canvas width=&quot;500&quot; height=&quot;500&quot; id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
+&lt;script&gt;
+
+    var data = [ 16, 68, 20, 30, 54 ];
+
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code>
+</pre>
+
+        <p>
+            上面的页面包括了一个canvas 和 <code>script</code> 元素。
+            canvas 元素是屏幕上的一个矩形画布。
+            <code>width</code>和<code>height</code>属性决定了画布的大小。
+            Canvas 元素与 DIV 一样都是块元素，也可以在页面中设置该样式和定位。
+        </p>
+
+        <p>
+            在script 脚本中的<code>data</code> 变量是一组用于绘制饼图的数据集。
+        </p>
+
+        <p>
+            在JS脚本设置中设置data变量后，再获取canvas元素及其2d上下文的引用，接着绘制矩形。
+        </p>
+
+<pre class='wrap'>
+<code>// 获取canvas 元素引用
+var canvas = document.getElementById('canvas');
+
+// 获取canvas 绘图上下文引用
+var c = canvas.getContext('2d');
+
+// 绘制
+c.fillStyle = "gray";
+c.fillRect(0,0,500,500);</code>
+</pre>
+
+        <h3>
+            <a id="add_data">添加数据</a>
+        </h3>
+
+        <p>Now you can draw some data. Do this by looping over the data array.
+             For each data point fill in a rectangle with
+            the x determined by the array index and the height determined by the data value.</p>
+
+        <p>
+            现在开始填充数据。
+            通过遍历数组，每一个数组元素填充矩形，x 由数组的下标决定，高度由元素值决定。
+        </p>
+<pre class='wrap'>
+<code>// 填充绘制
+c.fillStyle = &quot;blue&quot;;
+for(var i=0; i&lt;data.length; i++) {
+    var dp = data[i];
+    <b>c.fillRect(25 + i*100, 30, 50, dp*5);</b>
+}</code>
+</pre>
+
+        <p>
+            现在刷新你的浏览器。如图：
+        </p>
+        <div class='photo'>
+            <img src="images/barchart1.png" />
+            <p>
+                <b>屏幕快照</b> 
+                平面数据条
+            </p>
+        </div>
+
+        <p>The first problem is that the bars are coming down from the top instead of the bottom. Remember that the y axis is
+            0 at the top and increases as you go down. 
+            To make the bars come up from the bottom change the y value to be
+            calculated as the height of the canvas (500) minus 
+            the height of the bar (dp*5) and then subtract off an extra
+            30 to make it fit.</p>
+        <p>
+            第一个问题是条形是从上往下增长的，而非从下到上。因为y轴值为0在上面，向下为正方向增加。
+            为了让条形块从下往上增长，需要计算y的值。该值求得为 canvas （500）的高度减去条形的高度（dp * 5），
+            再减去30的偏移量。
+        </p>
+<pre>
+<code>
+// 填充数据
+c.fillStyle = &quot;blue&quot;;
+for(var i=0; i&lt;data.length; i++) {
+    var dp = data[i];
+    <b>c.fillRect(25 + i*100, 500-dp*5 - 30 , 50, dp*5);</b>
+}
+</code>
+</pre>
+
+        <p>现在看起来这样：</p>
+
+        <div class='photo'>
+            <img src="images/barchart2.png" />
+            <p>
+                <b>屏幕快照</b> 修正排列方向
+            </p>
+        </div>
+
+        <h3>
+            <a id="axislines">轴线与标签</a>
+        </h3>
+
+        <p>
+            从定点开始在左边及底部，通过描边路径添加轴线。
+        </p>
+
+<pre class='wrap'>
+<code>// 添加轴线
+c.fillStyle = &quot;black&quot;;
+c.lineWidth = 2.0;
+c.beginPath();
+c.moveTo(30,10);
+c.lineTo(30,460);
+c.lineTo(490,460);
+c.stroke();</code>
+</pre>
+
+        <p>
+            接着在左侧添加刻度值
+        </p>
+<pre class='wrap'>
+<code>// 绘制文本及短线
+c.fillStyle = &quot;black&quot;;
+for(var i=0; i&lt;6; i++) {
+    c.fillText((5-i)*20 + &quot;&quot;,4, i*80+60);
+    c.beginPath();
+    c.moveTo(25,i*80+60);
+    c.lineTo(30,i*80+60);
+    c.stroke();
+}</code>
+</pre>
+
+        <p>
+            最后添加头五个月年份底部的标签。
+        </p>
+<pre class='wrap'>
+<code>var labels = [&quot;JAN&quot;,&quot;FEB&quot;,&quot;MAR&quot;,&quot;APR&quot;,&quot;MAY&quot;];
+// 绘制水平文本
+for(var i=0; i&lt;5; i++) {
+    c.fillText(labels[i], 50+ i*100, 475);
+}</code>
+</pre>
+
+        <p>The result looks like this:</p>
+
+        <div class='photo'>
+            <img src="images/barchart2_5.png" />
+            <p>
+                <b>屏幕快照</b> 包含轴线及标签的图表
+            </p>
+        </div>
+
+        <p>
+            我们还需要做一些调整。先将背景变成白色让看起来色调没有那么沉，然后调整条形位置从（0, 0）开始。
+        </p>
+
+<pre class='wrap'>
+<code>// 绘制背景
+<b>c.fillStyle = &quot;white&quot;;</b>
+c.fillRect(0,0,500,500);
+
+// 填充数据
+c.fillStyle = &quot;blue&quot;;
+for(var i=0; i&lt;data.length; i++) {
+    var dp = data[i];
+    <b>c.fillRect(36 + i*100, 460-dp*5 , 50, dp*5);</b>
+}</code>
+</pre>
+
+        <p>现在最终的图表看起来是这样的：</p>
+
+        <div class='photo'>
+            <img src="images/barchart3.png" />
+            <p>
+                <b>屏幕快照</b> 改进的条形图</p>
+        </div>
+
+        <h3>
+            <a id="piechart">饼图</a>
+        </h3>
+
+        <p>
+            现在让我们使用相同的数据绘制饼图。代码会非常相似的。
+        </p>
+        <p>
+            新建文档，命名为<code>piechart.html</code>
+            包含内容：
+        </p>
+
+<pre class='wrap'><code>&lt;html&gt;
+&lt;body&gt;
+&lt;canvas width=&quot;500&quot; height=&quot;500&quot; id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
+&lt;script&gt;
+// 初始化数据集
+var data = [ 100, 68, 20, 30, 100 ];
+
+var canvas = document.getElementById('canvas');
+var c = canvas.getContext('2d');
+// 填充背景
+c.fillStyle = "white";
+c.fillRect(0,0,500,500);
+
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+        <p>
+            现在增加一个颜色的列表以及计算数据集的和。
+        </p>
+<pre class='wrap'><code>// 颜色列表
+var colors = [ &quot;orange&quot;, &quot;green&quot;, &quot;blue&quot;, &quot;yellow&quot;, &quot;teal&quot;];
+
+// 计算数组的总和
+var total = 0;
+for(var i=0; i&lt;data.length; i++) {
+    total += data[i];
+}</code></pre>
+
+        <p>
+            绘制扇形看起来很复杂，实际上很容易。
+            每一个扇形从圆心为（250, 250）的圆开始，绘制从上一个角度到新角度的弧线。
+            角度是由饼图的数据部分组成的，转换成弧度制。上一个角度是之前循环绘制结束之后的角度（从0开始）。
+            弧线的中心在（250,250）半径为 100，接着绘制一条线回到中心，填充并描边。
+        </p>
+<pre class='wrap'><code>// 绘制饼图数据
+var prevAngle = 0;
+for(var i=0; i&lt;data.length; i++) {
+    // 每部分所占分数
+    var fraction = data[i]/total;
+    // 计算开始角度
+    var angle = prevAngle + fraction*Math.PI*2;
+    
+    // 绘制扇区部分
+    c.fillStyle = colors[i];
+    
+    // 创建路径
+    c.beginPath();
+    c.moveTo(250,250);
+    <b>c.arc(250,250, 100, prevAngle, angle, false);</b>
+    c.lineTo(250,250);
+    
+    // 填充
+    c.fill();
+    
+    // 描边
+    c.strokeStyle = &quot;black&quot;;
+    c.stroke();
+    
+    // 更新下一扇形的起始角度
+    prevAngle = angle;
+}</code></pre>
+
+        <p>
+            最后添加在图表下添加一些文本。
+            让文本居中，必须先计算文本的宽度：
+        </p>
+<pre class='wrap'><code>// 绘制居中文本
+c.fillStyle = &quot;black&quot;;
+c.font = &quot;24pt sans-serif&quot;;
+var text = &quot;Sales Data from 2025&quot;;
+var metrics = c.measureText(text);
+c.fillText(text, 250-metrics.width/2, 400);
+</code></pre>
+
+        <p>然后看上去：</p>
+
+        <p class='photo'>
+            <img src="images/piechart1.png" />
+        </p>
+
+        <h3>
+            <a id="add_gradients">添加渐变</a>
+        </h3>
+
+        <p>
+            为了让图表看上去更艳丽，可以给每块添加径向渐变，像这样：
+        </p>
+
+<pre class='wrap'><code>// 绘制扇区部分
+<b>//c.fillStyle = colors[i];</b>
+
+// 填充径向渐变
+var grad = c.createRadialGradient( 250,250, 10, 250,250, 100);
+grad.addColorStop(0,"white");
+grad.addColorStop(1,colors[i]);
+<b>c.fillStyle = grad;</b></code></pre>
+
+        <p>
+            白色到各块的颜色渐变填充了从中心到边缘的扇形，图表添加了一些深度变化。看起来这样：
+        </p>
+        <p class='photo'>
+            <img src="images/piechart2.png" />
+        </p>
+
+        <p>
+            为了让该图表更实用，读者可以尝试进行以下的一些改进提高。
+        </p>
+        <ul>
+            <li>
+                新增数据变成12个月份。
+            </li>
+            <li>
+                创建线表，将每个数据绘制成圆，并使用折线连接。
+            </li>
+            <li>
+                使用渐变填充，圆角或者黑色轮廓美化饼图。
+            </li>
+            <li>
+                绘制每部分饼图的标签
+            </li>
+        </ul>
+
+    </div>
+    <div id="footer">
+        <div class='chapnav bottom'>
+            <a class="prevchap" href="chapter01.html">上一章</a>
+            <a class="toclink" href="toc.html">目录</a>
+            <a class="nextchap" href="chapter03.html">下一章</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+#examplewrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin: 0; padding: 0;
+    background-color: rgba(255,255,255,0.7);
+    width: 100%;
+    height: 100%;
+}
+#exampleframe {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: white;
+    border: 1px solid black;
+    width:  650px;
+    height: 650px;
+    margin: auto auto;
+    padding: 0;
+}
+

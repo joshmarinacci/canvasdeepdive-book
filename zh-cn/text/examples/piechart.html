@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>深入理解 HTML Canvas 第二章 动手：制作图表 案例</title>    
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="500" height="500"></canvas>    
+    <script>
+        // 初始化数据集
+        var data = [ 16, 68, 20, 30, 54 ]
+
+        var canvas = document.getElementById('canvas')
+        var c = canvas.getContext('2d')
+
+        // 颜色列表
+        var colors = ['orange', 'green', 'blue', 'yellow', 'teal']
+
+        // 计算数组的总和
+        var total = 0
+        for(var i=0; i < data.length; i++) {
+            total += data[i]
+        }
+
+        // 绘制饼图数据
+        var prevAngle = 0;
+        for(var i=0; i < data.length; i++) {
+            // 每部分所占分数
+            var fraction = data[i] / total
+            // 计算开始角度
+            var angle = prevAngle + fraction*Math.PI*2
+            
+            // 绘制扇区部分
+            // c.fillStyle = colors[i]
+            // 填充径向渐变
+            var grad = c.createRadialGradient( 250,250, 10, 250,250, 100)
+            grad.addColorStop(0,"white")
+            grad.addColorStop(1,colors[i])
+            c.fillStyle = grad
+            
+            // 创建路径
+            c.beginPath()
+            c.moveTo(250,250)
+            c.arc(250,250, 100, prevAngle, angle, false)
+            c.lineTo(250,250)
+            
+            // 填充
+            c.fill()
+            
+            // 描边
+            c.strokeStyle = "black"
+            c.stroke()
+            
+            // 更新下一扇形的起始角度
+            prevAngle = angle
+        }
+
+        // 绘制居中文本
+        c.fillStyle = "black"
+        c.font = "24pt sans-serif"
+        var text = "Sales Data from 2025"
+        var metrics = c.measureText(text)
+        c.fillText(text, 250-metrics.width/2, 400)
+    </script>
+</body>
+</html>

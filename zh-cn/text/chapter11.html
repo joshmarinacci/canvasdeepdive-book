@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>深入理解 HTML Canvas 第十一章 WebAudio 网页音频</title>
+    <link rel="stylesheet" type="text/css" href="./toolkit/style/master.css">
+    <script src='toolkit/scripts/jquery.js'></script>
+    <script src='toolkit/scripts/setup.js'></script>
+    <script src='toolkit/scripts/jangle.js'></script>
+</head>
+
+<body>
+
+    <div id="header">
+        <h2>第十一章</h2>
+        <h1>WebAudio 网页音频</h1>
+    </div>
+
+    <div id="content">
+        <h3>
+            <a id='overview'>概述</a>
+        </h3>
+        <p>
+            目前为止，已经展示了2d绘图，动画以及3d硬件加速。当你使用这些技术的时候，你可能注意到一些东西缺失的：声音！
+            传统上如果不使用插件网页上要展示优质音频是不可能的，现在出现了一个新的音频API，就是
+            <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">WebAudio</a>改变了这种状况。
+        </p>
+
+        <p>
+            注意该API还在<i>变化</i>中，尽管比之前稳定了一点。使用<code>WebAudio</code>作为实验使用而非生产环境中，最少不要回退到Flash。
+            试试 <a href="http://www.schillmania.com/projects/soundmanager2/">SoundManager2</a>作为备用解决方案。
+        </p>
+
+        <h3>
+            <a id='audiovswebaudio'>Audio元素 vs WebAudio</a>
+        </h3>
+
+        <p>
+            你应该听过<i>Audio 元素</i>。这是个新增加到H5中的新元素，看起来这样：<code>&lt;audio src=&quot;music.mp3&quot;/&gt;
+                </code>。Audio元素播放音乐非常友好。与使用图片一样使用Audio即可。浏览器会展示控制播放的开关控件。
+            同时它也包含一个小小的JS API。然而Audio元素只是用来播放音乐而已。播放短小的音效和多个声效并不容易，而你只能每次播放一个。
+            最重要的一点是你不能生成音频或者存取音频样本进一步处理。
+            Audio元素适合做：播放音乐，但又很大的限制。
+        </p>
+        <p>
+            为了解决这些短板问题，浏览器厂商制定了WebAudio接口的技术文档。
+            它定义了一个完整的声频处理接口，包括音频生成，过滤，接收以及采样。如果只想播放音频的就使用Audio元素。
+            需要更多控制处理的就使用WebAudio。
+        </p>
+        <p>
+            完整的WebAudio接口文档太多了，这个章节是讲不完的。所以我只会讲对Canvas开发者感兴趣的部分：
+            声效和可视化处理。
+        </p>
+
+        <h3>
+            <a id='playback'>简单回放</a>
+        </h3>
+
+        <p>
+            对于图像处理使用图像上下文。对应Audio来说，也是一样。我们需要一个audio上下文。
+            由于文档还不是正式标准，我们使用 <code>webkitAudioContext()</code>。
+            确定页面加载完毕之后再创建初始化音频系统。
+        </p>
+
+<pre><code>var ctx; // 音频上下文
+var buf; // 音频缓存
+
+// 初始化音频系统
+function init() {
+    console.log("in init");
+    try {
+        ctx = new webkitAudioContext(); // 现在可以使用AudioContext了
+        loadFile();
+    } catch(e) {
+        alert('you need webaudio support');
+    }
+}
+window.addEventListener('load',init,false);</code></pre>
+
+        <p>
+            创建音频上下文之后，就可以加载声音了。加载声音就像加载其他远程的资源一样，使用<code>XMLHttpRequest</code>。
+            我们需要设置类型为 'arraybuffer' 而不是 text, xml 或者JOSN。
+            由于<code>JQuery</code> 还不支持 'arraybuffer' [不确定?]，我们直接使用<code>XMLHttpRequest API。</code>
+        </p>
+
+<pre><code>//加载并解码mp3文件
+function loadFile() {
+    var req = new XMLHttpRequest();
+    req.open("GET","music.mp3",true);
+    req.responseType = "arraybuffer";
+    req.onload = function() {
+        // 解码加载的数据
+        ctx.decodeAudioData(req.response, function(buffer) {
+            buf = buffer;
+            play();
+        });
+    };
+    req.send();
+}</code></pre>
+
+        <p>
+            文件加载之后，需要解码到一个音频缓存区里。上面的代码已完成该功能，还包括了另一个回调函数play。
+            解码之后播放音频。
+        </p>
+
+<pre><code>// 播放加载文件
+function play() {
+    // 从缓存中创建一个源节点
+    var src = ctx.createBufferSource(); 
+    src.buffer = buf;
+    // 连接最终的输出代码（扬声器）
+    src.connect(ctx.destination);
+    // 马上播放
+    src.noteOn(0);
+}</code></pre>
+
+        <p>
+            我打算详细地过上面的代码片段，因为这对于你明白这里完成什么功能非常重要。
+        </p>
+        <p>
+            在<code>WebAudio</code>中的一切都围绕着<i>节点（nodes）</i>。
+            为了处理声音，需要将节点绑定到一个链表或图中，然后开始处理。
+            回放音频，需要<i>source</i>节点以及<i>detination</i>节点。
+            <code>ctx.createBufferSource()</code>创建source节点，然后将audio音频缓存设置到声音上。
+            <code>ctx.destination</code>是一个包含标准目标输出的属性，通常就是电脑的扬声器。
+            以上两个节点使用 <code>connect</code> 函数连接。连接之后就能调用源节点的函数<code>notOn(0)</code>来播放声音。
+        </p>
+        <h3>
+            <a id='nodes'>WebAudio 节点</a>
+        </h3>
+
+        <p>
+            目前为止使用了一个源<i>source</i>和目标<i>destination</i>节点，当让，WebAudio拥有很多其他的节点类型。
+            创建一个打鼓app，你需要创建多个<i>source</i>源节点，每一个鼓需要一个，连接到输出使用<code>AudioChannelMerger</code>。
+            控制每个鼓声使用<code>AudioGainNode</code>。
+        </p>
+
+        <p>更多WebAudio 节点：</p>
+
+        <ul>
+            <li>JavaScriptAudioNode：直接通过Javascript处理</li>
+            <li>BiquadFilterNode：低通高通滤波</li>
+            <li>DelayNode：延迟</li>
+            <li>ConvolverNode：实时线性效果，如混响</li>
+            <li>RealtimeAnalyserNode：声音可视化</li>
+            <li>AudioPannerNode：处理立体声， 多波段以及3d环绕音</li>
+            <li>AudioChannelSplitter以及AudioChannelMerger</li>
+            <li>Oscillator：直接生成波形</li>
+        </ul>
+
+        <h3>
+            <a id='clips'>声音效果</a>
+        </h3>
+
+        <p>
+            标准的<code>audio</code>HTML 元素也可以用来做声音特效，但效果并不是很好。
+            关于声频怎样和什么时候播放你没有太多的精确控制。某些实现效果还不能让你一次播放多个声频。
+            对于歌曲来说确实是够了，但对于游戏中的声音特效确实远远不够的。<code>WebAudio API</code>让你能够进行声音剪辑，
+            让声音在精确的时间播放并重复叠加。
+        </p>
+
+        <p>
+            播放单一声音多次，我们不需要做额外的工作。
+            我们只选哟创建多个缓冲源。
+            以下代码定义了<code>play</code>函数，用来创建缓冲源，每次被调用就会立即播放。
+        </p>
+<pre><code>//play the loaded file
+function play() {
+    // 从缓存中创建源节点
+    var src = ctx.createBufferSource(); 
+    src.buffer = buf;
+    // 连接最终的输出节点 (扬声器)
+    src.connect(ctx.destination);
+    // 立即播放
+    src.noteOn(0);
+}</code></pre>
+
+        <p>
+            <a href='../canvasdeepdive-examples/WebAudio/FFT/effects.html'>这里</a>查看demo。
+            每次按下按钮，就会播放一个简短的镭射声音。（来自<a href='http://www.freesound.org/people/inferno/sounds/18379/'>inferno on freesound.org</a>）
+            当你每次快速按下按钮，你就听见能正确地叠加在一起。
+            我们没有做额外的工作处理实现这种情况。<code>Web Audio</code>自动处理的。
+            在游戏中，每次一个人物开枪的时候我们就调用play函数。如果四个玩家同时开枪，你会听见正确的声音。
+        </p>
+        <p>
+            我们也可以通过覆盖声音创建新的音效。<code>noteOn()</code>函数延迟一定的时间（秒）播放声音。
+            通过播放镭射片段四次，每次偏移1/4秒，来创建新的声音。这样就会清晰地叠加，并创建了一个新的音效。
+        </p>
+<pre><code>var time = ctx.currentTime;
+for(var i=0; i&lt;4; i++) {
+    var src = ctx.createBufferSource(); 
+    src.buffer = buf;
+    // 连接最终的输出节点 (扬声器)
+    src.connect(ctx.destination);
+    // 立即播放
+    src.noteOn(time+i/4);
+}
+</code></pre>
+
+        <p>
+            注意我们将当前的时间加上<code>audio</code>上下文的偏移时间，得到每个片段的偏移时间。
+        </p>
+
+        <p>
+            尝试 <a href='../canvasdeepdive-examples/WebAudio/FFT/effects.html'>这里</a> 的最终版本
+        </p>
+
+        <h3>
+            <a id='visualization'>Audio 可视化</a>
+        </h3>
+
+        <p>
+            如果不能将音效输出到图形显示器上，有什么意思？！
+            我喜欢声音可视化。如果你曾使用WinAmp或者itunes可视化工具，那么你应该就会很熟悉。
+        </p>
+        <p>
+            所有的可视化器的工作流程都完全一样：动画的每一帧都获取当前声音的比率分析，然后通过某种有趣的方式绘制频率。
+            <code>WebAudio API</code>使用<code>RealtimeAnalyserNode</code>实现起来很简单。
+        </p>
+        <p>
+            首先，我们跟之前一样加载audio。我添加到了几个额外的变量，
+            <code>fft, samples</code> 和 <code>setup</code>。
+        </p>
+<pre><code>var ctx; // audio 上下文
+var buf; // audio 缓冲
+var fft; // fft audio 节点
+var samples = 128;
+var setup = false; // 指示audio是否准备好
+
+
+// 初始化声音系统
+function init() {
+    console.log("in init");
+    try {
+        ctx = new webkitAudioContext(); //is there a better API for this?
+        setupCanvas();
+        loadFile();
+    } catch(e) {
+        alert('you need webaudio support' + e);
+    }
+}
+window.addEventListener('load',init,false);
+
+// 加载mp3文件
+function loadFile() {
+    var req = new XMLHttpRequest();
+    req.open("GET","music.mp3",true);
+    // 因为需要设置'arraybuffer'类型，所以不使用jQuery
+    req.responseType = "arraybuffer";
+    req.onload = function() {
+        // 解码加载数据
+        ctx.decodeAudioData(req.response, function(buffer) {
+            buf = buffer;
+            play();
+        });
+    };
+    req.send();
+}</code></pre>
+
+        <p>
+            之前我们使用源和目标节点来播放音乐。
+            这次我们在他们之间使用一个analyser节点。
+        </p>
+
+<pre><code>function play() {
+// 从buffer中创建一个源节点
+var src = ctx.createBufferSource(); 
+src.buffer = buf;
+
+// 创建 fft
+fft = ctx.createAnalyser();
+fft.fftSize = samples;
+
+// 通过连接关联
+src.connect(fft);
+fft.connect(ctx.destination);
+
+// 立即播放
+src.noteOn(0);
+setup = true;
+}</code></pre>
+        <p>
+            上面的函数使用createAnalyser创建一个analysis节点。
+        </p>
+        <p>I've called the analyser node
+            <code>fft</code> which is short for a Fast Fourier Transform. </p>
+            我已经调用analyser节点<code>fft</code>，它其实是快速傅立叶变换简写。
+        <p>
+            <i>马上进入到疯狂的声音数学中</i>
+        </p>
+        <p>
+            如果你看一下含有声音的缓冲区，你会看到只有一堆样本，很可能每秒有四十四个样本。
+            它们代表离散的振幅值。做音乐可视化我们不想要直接的样本，而是波形。
+            当你听到一个特定的音调时，你真正听到的是一堆重叠的波形，随着时间的推移被切割成振幅的样本。
+        </p>
+        <p>
+            我们想要一个频率的列表，而不是振幅，所以我们需要一种方法来转换它。声音从时间域开始。
+            离散傅立叶变换从时域转换到频域。
+            快速傅立叶变换（FFT）是一种特别的算法，可以很快地完成转换。
+            要做到这一点的数学可能很棘手，但Chrome团队中的聪明人已经在分析器节点中为我们做了这件事。
+            我们只需要在需要的时候取最后的值。
+        </p>
+        <p>
+            关于离散傅立叶变换以及快速傅里叶变换的完整的解释，请看
+            <a href='http://en.wikipedia.org/wiki/Fast_Fourier_transform'>维基</a>。
+        </p>
+
+        <h3>
+            <a id='drawing'>绘制频率</a>
+        </h3>
+
+        <p>
+            现在绘制一点东西。回想在动画章节我们所学的。创建一个画布，获取上下文，每一帧中调用绘制函数。
+        </p>
+<pre><code>var gfx;
+function setupCanvas() {
+    var canvas = document.getElementById('canvas');
+    gfx = canvas.getContext('2d');
+    webkitRequestAnimationFrame(update);
+}</code></pre>
+
+        <p>
+            需要一个变量来存储音频数据。我们使用一种Javascript的新数据类型Uint8Array用来支持音频及3d。
+            跟Javascript可以存放任何类型的数组不同，一个Uint8Array被设计成只能存储无符号八位二进制数，例如：一个比特数组。
+            JavaScript引入了这些新的数组类型，支持对二进制缓冲区、音频样本和视频帧等二进制数据的快速访问。获取这些数据我们调用<code>fft.getByteFrequencyData(data)</code>。
+        </p>
+<pre><code>function update() {
+    webkitRequestAnimationFrame(update);
+    if(!setup) return;
+    gfx.clearRect(0,0,800,600);
+    gfx.fillStyle = 'gray';
+    gfx.fillRect(0,0,800,600);
+    
+    var data = new Uint8Array(samples);
+    fft.getByteFrequencyData(data);
+    gfx.fillStyle = 'red';
+    for(var i=0; i&lt;data.length; i++) {
+        gfx.fillRect(100+i*4,100+256-data[i]*2,3,100);
+    }
+    
+}</code></pre>
+        <p>
+            一旦有了数据，我们就可以画出来了。
+            为了保持简单，我只是把它画成一系列的条形图，其中y位置基于样本数据的当前值。
+            由于我们使用的是Uint8Array每个值在0和255之间，所以我让它乘以二使运动增大。下面是它的样子：
+        </p>
+        <div class="photo">
+            <img src="images/webaudio_bars.png" />
+            <p>
+                <b>例子</b>Music Bars (
+                <a href='../canvasdeepdive-examples/WebAudio/FFT/test2.html'>运行</a>)</p>
+            <p>
+                <i>从128个实时FFT样本中绘制的矩形</i>
+            </p>
+        </div>
+
+        <p>
+            对于只有几行的Javascript来说，这并不坏。（我还不确定后半部分为什么是平的。或者是一个立体声/单声道的bug？）
+            这是一个豪华版。音频代码是一样的，我只是改变了如何绘制样本。
+        </p>
+        <div class="photo">
+            <img src="images/webaudio_blur.png" />
+            <p>
+                <b>例子</b>WinAMP 样式可视化器 (
+                <a href='../canvasdeepdive-examples/WebAudio/FFT/blur.html'>运行</a>)</p>
+            <p>
+                <i>从128个实时FFT样本中通过复制拉伸绘制的线</i>
+            </p>
+        </div>
+
+
+        <h3>
+            <a>下一步</a>
+        </h3>
+        <p>
+            使用WebAudio有很多比这里所讲的能做的。首先，我建议你浏览一下HTML5 Rocks 的教程：
+        </p>
+        <ul>
+            <li>
+                <a href='http://www.html5rocks.com/en/tutorials/webaudio/intro/'>WebAudio 介绍</a>
+            </li>
+            <li>
+                <a href='http://www.html5rocks.com/en/tutorials/webaudio/games/'>游戏中的 WebAudio</a>
+            </li>
+        </ul>
+
+        <p>接下来看看 0xFE's
+            <a href='http://0xfe.blogspot.com/2011/08/generating-tones-with-web-audio-api.html'>使用Web音频API生成音调</a> 
+            学习如何直接从数学波形中生成声音。
+            以及
+            <a href='http://0xfe.blogspot.com/2011/08/web-audio-spectrum-analyzer.html'>网络音频频谱分析仪</a>.
+        </p>
+
+        <p>完整 (草案)
+            <a href='https://www.w3.org/TR/webaudio/'>WebAudio 文档 </a>
+        </p>
+
+        <p>
+            下一章节中我们会获取用户的摄像头（webcam）。
+        </p>
+
+    </div>
+    <div id="footer">
+        <div class="chapnav bottom">
+            <a class="prevchap" href="chapter10.html">上一章</a>
+            <a class="toclink" href="toc.html">目录</a>
+            <a class="nextchap" href="chapter12.html">下一章</a>
+        </div>
+    </div>
+</body>
+
+</html>
