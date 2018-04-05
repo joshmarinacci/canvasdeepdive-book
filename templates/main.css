@@ -1,0 +1,70 @@
+	/*
+	body lato 400 18px
+subhead exo 500 20px
+head exo 400 44px, 24b5a2
+background fafaf0
+*/
+
+
+body {
+	background-color: #fafaf0;
+	font-family: Lato, Helvetica, Arial, sans-serif;
+	font-size: 170%;
+}
+
+
+
+h1 {
+	font-family: Exo, Helvetica, Arial, sans-serif;
+	font-size: 300%;
+	color: #24b5a2;
+}
+h2, h3 {
+	font-family: Exo, Helvetica, Arial, sans-serif;
+	font-size: 180%;
+	padding-top: 2em;
+}
+
+code {
+	font-family: 'Source Code Pro', monospace ;
+/*	font-family: 'Inconsolata', monospace;*/
+}
+
+pre code {
+	line-height: 170%;
+}
+
+body {
+	padding-bottom: 100px;
+}
+.interactive img {
+	max-width: 100%;
+}
+
+.jangle code i {
+	border: 0px solid #c00;
+	border-radius: 1em;
+	padding: 1px 6px;
+	color: black;
+	background-color: #fcc;
+	font-style: normal;
+	font-weight: bold;
+}
+.jangle canvas {
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	max-width: 100%;
+}
+
+.jangle pre {
+	border-width: 0px;
+	background-color: white;
+}
+
+.jangle .panel-heading, .screenshot .panel-heading {
+	font-size: 90%;
+}
+.jangle .panel-heading b, .screenshot .panel-heading b {
+	font-size: 90%;
+	padding-right: 1em;
+}

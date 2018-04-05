@@ -1,0 +1,9 @@
+<div class='panel panel-warning screenshot'>
+    <div class='panel-heading'>
+        <b style='font-size:90%'>SCREENSHOT</b>
+        {{text}}
+    </div>
+    <div class='panel-body'>
+        <img src='{{url}}'/>
+    </div>
+</div>

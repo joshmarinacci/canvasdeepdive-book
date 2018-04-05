@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<style>
+.axis path, .axis line{
+     fill: none;
+     stroke: black;
+     shape-rendering: crispEdges;
+}
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+</style>
+    </head>
+    <body>
+        <button id='update'>update</button><br/>
+<script type='text/javascript'>
+
+var w = 500;   // save our width and height for later
+var h = 100;
+var dataset = [ 5, 50, 300, 800, 275];
+var svg = d3.select('body')
+            .append('svg')
+            .attr('w',w)
+            .attr('h',h);
+
+var yscale = d3.scale.linear()
+        .domain([0, d3.max(dataset, function(d) { return d; })])
+//        .domain([0, 1000])
+        .range([h-10, 10]);
+
+
+
+svg.selectAll('rect')
+    .data(dataset)
+    .enter()
+    .append('rect')
+    .attr('fill','teal')
+    .attr('x',function(d,i) {
+        return i*30;
+    })
+    .attr('width', function(d,i) {
+        return 28;
+    })
+    .attr('y',function(d,i) {
+        return yscale(d);
+    })
+    .attr('height', function(d,i) {
+        return h-yscale(d);
+    })
+    ;
+
+var yaxis = d3.svg.axis()
+                  .scale(yscale)
+                  .orient('right')
+                  .ticks(5)
+                  ;
+
+svg.append('g')
+      .attr('class','y axis') //add the axis class
+      .call(yaxis);
+
+d3.select('button').on('click', function() {
+    //update the data
+    dataset = [ 400, 800, 100, 600, 500, 1000];
+    yscale.domain([0, d3.max(dataset, function(d) { return d; })])
+    //adjust the y values
+    svg.selectAll('rect')
+        .data(dataset)
+        .transition().duration(500)
+        .delay(function(d,i) {
+            return i/dataset.length * 1000; //using msec
+        })
+        .attr('y',function(d,i) {
+            //return h-yscale(d);
+            return yscale(d);
+        })
+        .attr('height', function(d,i) {
+            //return yscale(d);
+            return h-yscale(d);
+        });
+        svg.select('.y.axis')
+            .transition()
+            .duration(1000)
+            .call(yaxis);
+});
+
+</script>
+    </body>
+</html>
